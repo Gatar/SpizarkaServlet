@@ -1,45 +1,58 @@
 package com.gatar.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
 
-@Entity
-public class Item  {
+/**
+ * Item entity class. For one item could exists many barcodes, so each bitem are connected by @OneToMany with barcodes entities.
+ * If table "ITEMS" doesn't exist, application creates it automaticaly.
+ */
 
-    @Column
-    @NotNull
-    private String barcode;
+@Entity(name="ITEMS")
+public class Item implements Serializable {
 
     @Id
-    @Column
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID_ITEM")
+    private Long id;
+
+    @Column(name = "TITLE")
     @NotNull
-    @OneToMany (mappedBy = "title")
     private String title;
 
-    @Column
+    @Column(name = "CATEGORY")
     @NotNull
     private String category;
 
-    @Column
+    @Column(name = "QUANTITY")
     @NotNull
-    private int quantity;
+    private Integer quantity;
 
-    @Column
+    @Column(name = "MINIMUM_QUANTITY")
     @NotNull
-    private int minimumQuantity;
+    private Integer minimumQuantity;
 
-    @Column
+    @Column(name = "DESCRIPTION")
     private String description;
 
-    public String getBarcode() {
-        return barcode;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Barcode> barcodes;
+
+    public Item() {
     }
 
-    public void setBarcode(String barcode) {
-        this.barcode = barcode;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -80,5 +93,26 @@ public class Item  {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Barcode> getBarcodes() {
+        return barcodes;
+    }
+
+    public void setBarcodes(List<Barcode> barcodes) {
+        this.barcodes = barcodes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item)) return false;
+        Item item = (Item) o;
+        return Objects.equals(getId(), item.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }
