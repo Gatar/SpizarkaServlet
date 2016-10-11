@@ -27,5 +27,10 @@ public class OutputDataController {
         return databaseService.getAllBarcodes();
     }
 
+    @RequestMapping("/getShopping")
+    public List<Item> getShoppingList(){
+        return databaseService.getShoppingList();
+    }
+
 
 }

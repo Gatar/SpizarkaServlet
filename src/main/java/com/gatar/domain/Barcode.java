@@ -16,14 +16,11 @@ import java.util.Objects;
 public class Barcode implements Serializable{
 
     @Id
-    @Column(name="BARCODE")
-    @NotNull
-    private String barcode;
+    @Column(name = "ID_BARCODE")
+    private Long idBarcode;
 
-    /**
-     * Used ONLY for receive id of connected item from POST methods. Base on this id we could create connection with correct item.
-     */
-    private Long id;
+    @Column(name="BARCODE")
+    private String barcode;
 
     @ManyToOne
     @JoinColumn(name="ID_ITEM")
@@ -42,12 +39,12 @@ public class Barcode implements Serializable{
         this.barcode = barcode;
     }
 
-    public Long getId() {
-        return id;
+    public Long getIdBarcode() {
+        return idBarcode;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdBarcode(Long idBarcode) {
+        this.idBarcode = idBarcode;
     }
 
     public Item getItem() {
@@ -62,12 +59,12 @@ public class Barcode implements Serializable{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Barcode)) return false;
-        Barcode barcode1 = (Barcode) o;
-        return Objects.equals(getBarcode(), barcode1.getBarcode());
+        Barcode barcode = (Barcode) o;
+        return Objects.equals(getIdBarcode(), barcode.getIdBarcode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBarcode());
+        return Objects.hash(getIdBarcode());
     }
 }

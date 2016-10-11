@@ -16,43 +16,57 @@ import java.util.Objects;
 @Entity(name="ITEMS")
 public class Item implements Serializable {
 
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_ITEM")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long idItem;
+
+    /**
+     * Item id number assigned in internal database in phone of user.
+     */
+    @Column(name = "ID_ITEM_ANDROID")
+    private Long idItemAndroid;
 
     @Column(name = "TITLE")
-    @NotNull
     private String title;
 
     @Column(name = "CATEGORY")
-    @NotNull
     private String category;
 
     @Column(name = "QUANTITY")
-    @NotNull
     private Integer quantity;
 
     @Column(name = "MINIMUM_QUANTITY")
-    @NotNull
     private Integer minimumQuantity;
 
     @Column(name = "DESCRIPTION")
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "ID_USER")
+    private Account account;
+
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Barcode> barcodes;
 
     public Item() {
     }
 
-    public Long getId() {
-        return id;
+    public Long getIdItem() {
+        return idItem;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdItem(Long idItem) {
+        this.idItem = idItem;
+    }
+
+    public Long getIdItemAndroid() {
+        return idItemAndroid;
+    }
+
+    public void setIdItemAndroid(Long idItemAndroid) {
+        this.idItemAndroid = idItemAndroid;
     }
 
     public String getTitle() {
@@ -71,16 +85,20 @@ public class Item implements Serializable {
         this.category = category;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 
-    public int getMinimumQuantity() {
+    public Integer getMinimumQuantity() {
         return minimumQuantity;
+    }
+
+    public void setMinimumQuantity(Integer minimumQuantity) {
+        this.minimumQuantity = minimumQuantity;
     }
 
     public void setMinimumQuantity(int minimumQuantity) {
@@ -93,6 +111,14 @@ public class Item implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     public List<Barcode> getBarcodes() {
@@ -108,11 +134,11 @@ public class Item implements Serializable {
         if (this == o) return true;
         if (!(o instanceof Item)) return false;
         Item item = (Item) o;
-        return Objects.equals(getId(), item.getId());
+        return Objects.equals(getIdItem(), item.getIdItem());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getIdItem());
     }
 }
