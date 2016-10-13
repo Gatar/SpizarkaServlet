@@ -1,48 +1,40 @@
 package com.gatar.controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gatar.domain.Barcode;
-import com.gatar.domain.Item;
-import com.gatar.services.DatabaseService;
+import com.gatar.domain.BarcodeDTO;
+import com.gatar.domain.ItemDTO;
+import com.gatar.services.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/spizarka")
 public class InputDataController {
 
     @Autowired
-    DatabaseService databaseService;
+    DataService dataService;
 
     /**
      * Save new/update existing item in database.
      * Attention!! NEW item MUST be add always BEFORE add connected with it barcode.
-     * @param item received
+     * @param itemDTO received
      * @return
      */
-    @RequestMapping(value = "/saveItem", method = RequestMethod.POST)
-    public HttpStatus saveItem(@RequestBody Item item){
-        databaseService.saveItem(item);
+    @RequestMapping(value = "/{user}/saveItem", method = RequestMethod.POST)
+    public HttpStatus saveItem(@PathVariable String username, @RequestBody ItemDTO itemDTO){
+        dataService.saveItem(itemDTO, username);
         return HttpStatus.OK;
     }
 
     /**
      * Save new/update existing barcode in database.
      * Attention!! Barcode binded with NEW item MUST be add always AFTER this item. Otherwise we have error beacause item with connected id doesn't exist.
-     * @param barcode received
+     * @param barcodeDTO received
      * @return
      */
-    @RequestMapping(value = "/saveBarcode",method = RequestMethod.POST)
-    public HttpStatus saveBarcode(@RequestBody Barcode barcode){
-        databaseService.saveBarcode(barcode);
+    @RequestMapping(value = "/{user}/saveBarcode",method = RequestMethod.POST)
+    public HttpStatus saveBarcode(@PathVariable String username, @RequestBody BarcodeDTO barcodeDTO){
+        dataService.saveBarcode(barcodeDTO, username);
         return HttpStatus.OK;
     }
 

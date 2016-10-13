@@ -1,11 +1,13 @@
 package com.gatar.controllers;
 
-import com.gatar.domain.Barcode;
+import com.gatar.domain.BarcodeDTO;
 import com.gatar.domain.Item;
-import com.gatar.services.DatabaseService;
-import com.gatar.services.EmailService;
+import com.gatar.domain.ItemDTO;
+import com.gatar.services.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -15,21 +17,21 @@ import java.util.List;
 public class OutputDataController {
 
     @Autowired
-    DatabaseService databaseService;
+    DataService dataService;
 
-    @RequestMapping("/getAllItems")
-    public List<Item> getAllItems(){
-        return databaseService.getAllItems();
+    @RequestMapping(value = "/{username}/getAllItems", method = RequestMethod.GET)
+    public List<ItemDTO> getAllItems(@PathVariable String username){
+        return dataService.getAllItems(username);
     }
 
-    @RequestMapping("/getAllBarcodes")
-    public List<Barcode> getAllBarcodes(){
-        return databaseService.getAllBarcodes();
+    @RequestMapping(value = "/{username}/getAllBarcodes", method = RequestMethod.GET)
+    public List<BarcodeDTO> getAllBarcodes(@PathVariable String username){
+        return dataService.getAllBarcodes(username);
     }
 
-    @RequestMapping("/getShopping")
-    public List<Item> getShoppingList(){
-        return databaseService.getShoppingList();
+    @RequestMapping(value = "/{username}/getShopping", method = RequestMethod.GET)
+    public List<Item> getShoppingList(@PathVariable String username){
+        return dataService.getShoppingList(username);
     }
 
 

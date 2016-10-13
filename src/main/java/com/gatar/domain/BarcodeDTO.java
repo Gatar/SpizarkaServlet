@@ -1,5 +1,8 @@
 package com.gatar.domain;
 
+/**
+ * Data Transfer Object used to receive/send one barcode from/to phone.
+ */
 public class BarcodeDTO {
 
     private String barcode;
@@ -23,5 +26,11 @@ public class BarcodeDTO {
 
     public void setIdItemAndroid(Long idItemAndroid) {
         this.idItemAndroid = idItemAndroid;
+    }
+
+    public Barcode toBarcode(){
+        Barcode barcode = new Barcode();
+        barcode.setBarcode(this.barcode);
+        return barcode;
     }
 }

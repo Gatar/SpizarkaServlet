@@ -129,6 +129,17 @@ public class Item implements Serializable {
         this.barcodes = barcodes;
     }
 
+    public ItemDTO toItemDTO(){
+        ItemDTO itemDTO = new ItemDTO();
+        itemDTO.setTitle(title);
+        itemDTO.setCategory(category);
+        itemDTO.setIdItemAndroid(idItemAndroid);
+        itemDTO.setDescription(description);
+        itemDTO.setMinimumQuantity(minimumQuantity);
+        itemDTO.setQuantity(quantity);
+        return itemDTO;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

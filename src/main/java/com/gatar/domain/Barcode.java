@@ -55,6 +55,13 @@ public class Barcode implements Serializable{
         this.item = item;
     }
 
+    public BarcodeDTO toBarcodeDTO(){
+        BarcodeDTO barcodeDTO = new BarcodeDTO();
+        barcodeDTO.setBarcode(barcode);
+        barcodeDTO.setIdItemAndroid(item.getIdItemAndroid());
+        return barcodeDTO;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

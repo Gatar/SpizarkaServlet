@@ -3,6 +3,9 @@ package com.gatar.domain;
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Data Transfer Object used to receive/send one item from/to phone.
+ */
 public class ItemDTO {
 
     /**
@@ -66,5 +69,16 @@ public class ItemDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Item toItem(){
+        Item item = new Item();
+        item.setTitle(title);
+        item.setDescription(description);
+        item.setQuantity(quantity);
+        item.setMinimumQuantity(minimumQuantity);
+        item.setIdItemAndroid(idItemAndroid);
+        item.setCategory(category);
+        return item;
     }
 }

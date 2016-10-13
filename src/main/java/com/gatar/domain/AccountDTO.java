@@ -1,6 +1,8 @@
 package com.gatar.domain;
 
-
+/**
+ * Data Transfer Object used to receive registration data from user phone.
+ */
 public class AccountDTO {
 
     private String username;
@@ -31,5 +33,13 @@ public class AccountDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Account toAccount(){
+        Account account = new Account();
+        account.setUsername(username);
+        account.setPassword(password);
+        account.setEmail(email);
+        return account;
     }
 }

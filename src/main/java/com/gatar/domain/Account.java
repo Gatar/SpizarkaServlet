@@ -24,6 +24,13 @@ public class Account implements Serializable {
     @Column(name = "EMAIL")
     private String email;
 
+    /**
+     * Version of data in database. After each data modification done by user in phone app,
+     * internal phone database increase data version by one and send it here.
+     * Each phone app before any internal database modification check is their version actual with this.
+     * If not, internal database is actualized from cloud and then modified.
+     *
+     */
     @Column(name = "DATA_VERSION")
     private Long dataVersion;
 
@@ -32,6 +39,14 @@ public class Account implements Serializable {
     private List<Item> items;
 
     public Account() {
+    }
+
+    public AccountDTO toAccountDTO(){
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setUsername(username);
+        accountDTO.setPassword(password);
+        accountDTO.setEmail(email);
+        return accountDTO;
     }
 
     public Integer getUserID() {

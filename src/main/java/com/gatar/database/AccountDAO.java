@@ -4,5 +4,5 @@ import com.gatar.domain.Account;
 import org.springframework.data.repository.CrudRepository;
 
 public interface AccountDAO extends CrudRepository <Account, Long> {
-
+    public Account findByUsername(String username);
 }
