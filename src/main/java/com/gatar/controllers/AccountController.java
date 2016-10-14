@@ -4,6 +4,7 @@ import com.gatar.database.AccountDAO;
 import com.gatar.domain.Account;
 import com.gatar.domain.AccountDTO;
 import com.gatar.services.AccountService;
+import com.gatar.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,9 @@ public class AccountController {
 
     @Autowired
     AccountService accountService;
+
+    @Autowired
+    EmailService emailService;
 
     /**
      * Get version of data saved in servlet database.
@@ -53,13 +57,10 @@ public class AccountController {
     /**
      * Send an email for email saved in database. If user didn't connect any email with his account email naturally won't be send.
      * @param username name of user needed to connect with right Account
-     * @return HttpStatus.OK when everything was OK, HttpStatus.NOT_ACCEPTABLE if there are no email in database
+     * @return HttpStatus.OK when everything was OK
      */
     @RequestMapping(value = "/{username}/rememberAccountData")
     public HttpStatus sendEmailWithAccountData(@PathVariable String username){
-        Optional<String> email = Optional.ofNullable(accountService.getAccount(username).getEmail());
-
-        //TODO dodać funkcję wysłania maila
-        return (email.isPresent())? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE;
+        return emailService.sendAccountDataRemember(username);
     }
 }

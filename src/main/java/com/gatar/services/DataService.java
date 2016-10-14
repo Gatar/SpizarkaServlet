@@ -48,7 +48,7 @@ public class DataService {
     }
 
     /**
-     * Get list of all barcodes from database, for one account.
+     * Get list of all barcodes SENDING_FROM database, for one account.
      * @return barcodeDTO object
      */
     public List<BarcodeDTO> getAllBarcodes(String username){
@@ -69,7 +69,7 @@ public class DataService {
     }
 
     /**
-     * Get list of all items from database, for one account.
+     * Get list of all items SENDING_FROM database, for one account.
      * @return itemDTO object
      */
     public List<ItemDTO> getAllItems(String username){

@@ -1,10 +1,11 @@
 package com.gatar.controllers;
 
 import com.gatar.domain.BarcodeDTO;
-import com.gatar.domain.Item;
 import com.gatar.domain.ItemDTO;
 import com.gatar.services.DataService;
+import com.gatar.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +20,9 @@ public class OutputDataController {
     @Autowired
     DataService dataService;
 
+    @Autowired
+    EmailService emailService;
+
     @RequestMapping(value = "/{username}/getAllItems", method = RequestMethod.GET)
     public List<ItemDTO> getAllItems(@PathVariable String username){
         return dataService.getAllItems(username);
@@ -29,9 +33,9 @@ public class OutputDataController {
         return dataService.getAllBarcodes(username);
     }
 
-    @RequestMapping(value = "/{username}/getShopping", method = RequestMethod.GET)
-    public List<Item> getShoppingList(@PathVariable String username){
-        return dataService.getShoppingList(username);
+    @RequestMapping(value = "/{username}/getShopping/{email}", method = RequestMethod.HEAD)
+    public HttpStatus sendShopingListtoEmail(@PathVariable String username, String recipietEmail){
+        return emailService.sendShoppingListEmail(recipietEmail,username);
     }
 
 

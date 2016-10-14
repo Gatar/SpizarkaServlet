@@ -6,6 +6,9 @@ import com.gatar.domain.AccountDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for account access, adding new accounts etc.
+ */
 @Service
 public class AccountService {
 
