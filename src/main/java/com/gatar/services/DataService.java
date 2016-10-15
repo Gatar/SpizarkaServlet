@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -26,25 +27,41 @@ public class DataService {
     AccountService accountService;
 
     /**
-     * Save new/update existing item in database.
-     * @param itemDTO object
+     * Save new/update existing item in database. Searching first in database if there exist item.
+     * @param itemDTO item data
+     * @param username
      */
     public void saveItem(ItemDTO itemDTO, String username){
+        Account account = accountService.getAccount(username);
+        Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(itemDTO.getIdItemAndroid(),account));
         Item item = itemDTO.toItem();
+        if(itemFromDatabase.isPresent()) item.setIdItem(itemFromDatabase.get().getIdItem());
         item.setAccount(accountService.getAccount(username));
         itemDAO.save(item);
     }
 
     /**
-     * Save new/update existing barcode.
-     * @param barcodeDTO object
+     * Save new barcode. If existing barcode will be find nothing will be saved (to prevent duplication).
+     * @param barcodeDTO barcode data
+     * @param username
+     * @return true - everything was OK, false - item binded with barcode doesn't exist
      */
-    public void saveBarcode(BarcodeDTO barcodeDTO, String username){
-        Barcode barcode = barcodeDTO.toBarcode();
+    public boolean saveBarcode(BarcodeDTO barcodeDTO, String username){
         Account account = accountService.getAccount(username);
-        barcode.setItem(itemDAO.findByIdItemAndroidAndAccount(barcodeDTO.getIdItemAndroid(),account));
 
+        //Check for presence of item
+        Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(barcodeDTO.getIdItemAndroid(),account));
+        if(!itemFromDatabase.isPresent()) return false;
+
+        //Check for presence of barcode
+        for(Barcode barcode : itemFromDatabase.get().getBarcodes()) {
+            if(barcode.getBarcode().equals(barcodeDTO.getBarcode())) return true;
+        }
+
+        Barcode barcode = barcodeDTO.toBarcode();
+        barcode.setItem(itemDAO.findByIdItemAndroidAndAccount(barcodeDTO.getIdItemAndroid(), account));
         barcodeDAO.save(barcode);
+        return true;
     }
 
     /**

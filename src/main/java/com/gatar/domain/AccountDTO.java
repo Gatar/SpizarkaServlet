@@ -1,5 +1,7 @@
 package com.gatar.domain;
 
+import java.util.Objects;
+
 /**
  * Data Transfer Object used to receive registration data from user phone.
  */
@@ -41,5 +43,20 @@ public class AccountDTO {
         account.setPassword(password);
         account.setEmail(email);
         return account;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AccountDTO)) return false;
+        AccountDTO that = (AccountDTO) o;
+        return Objects.equals(getUsername(), that.getUsername()) &&
+                Objects.equals(getPassword(), that.getPassword()) &&
+                Objects.equals(getEmail(), that.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUsername(), getPassword(), getEmail());
     }
 }

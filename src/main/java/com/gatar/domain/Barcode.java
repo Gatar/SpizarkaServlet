@@ -16,6 +16,7 @@ import java.util.Objects;
 public class Barcode implements Serializable{
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_BARCODE")
     private Long idBarcode;
 

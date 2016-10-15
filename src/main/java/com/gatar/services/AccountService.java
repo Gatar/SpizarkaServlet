@@ -64,7 +64,7 @@ public class AccountService {
     }
 
     public boolean isAccountExist(String username){
-        Optional<Account> receivedAccount = Optional.of(accountDAO.findByUsername(username));
+        Optional<Account> receivedAccount = Optional.ofNullable(accountDAO.findByUsername(username));
         return receivedAccount.isPresent();
     }
 }

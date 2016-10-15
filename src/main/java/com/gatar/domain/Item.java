@@ -48,7 +48,7 @@ public class Item implements Serializable {
     @JoinColumn(name = "ID_USER")
     private Account account;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Barcode> barcodes;
 
     public Item() {

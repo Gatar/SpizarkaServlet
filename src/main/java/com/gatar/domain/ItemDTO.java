@@ -2,6 +2,7 @@ package com.gatar.domain;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * Data Transfer Object used to receive/send one item from/to phone.
@@ -75,5 +76,23 @@ public class ItemDTO {
         item.setIdItemAndroid(idItemAndroid);
         item.setCategory(category);
         return item;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ItemDTO)) return false;
+        ItemDTO itemDTO = (ItemDTO) o;
+        return Objects.equals(getIdItemAndroid(), itemDTO.getIdItemAndroid()) &&
+                Objects.equals(getTitle(), itemDTO.getTitle()) &&
+                Objects.equals(getCategory(), itemDTO.getCategory()) &&
+                Objects.equals(getQuantity(), itemDTO.getQuantity()) &&
+                Objects.equals(getMinimumQuantity(), itemDTO.getMinimumQuantity()) &&
+                Objects.equals(getDescription(), itemDTO.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIdItemAndroid(), getTitle(), getCategory(), getQuantity(), getMinimumQuantity(), getDescription());
     }
 }
