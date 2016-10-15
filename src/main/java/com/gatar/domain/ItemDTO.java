@@ -12,15 +12,10 @@ public class ItemDTO {
      * Item id number assigned in internal database in phone of user.
      */
     private Long idItemAndroid;
-
     private String title;
-
     private String category;
-
     private Integer quantity;
-
     private Integer minimumQuantity;
-
     private String description;
 
     public Long getIdItemAndroid() {

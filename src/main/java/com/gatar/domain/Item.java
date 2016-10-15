@@ -13,6 +13,7 @@ import java.util.Objects;
  * If table "ITEMS" doesn't exist, application creates it automaticaly.
  */
 
+
 @Entity(name="ITEMS")
 public class Item implements Serializable {
 

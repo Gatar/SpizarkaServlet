@@ -1,15 +1,11 @@
 package com.gatar.controllers;
 
-import com.gatar.database.AccountDAO;
-import com.gatar.domain.Account;
 import com.gatar.domain.AccountDTO;
 import com.gatar.services.AccountService;
 import com.gatar.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/spizarka")
@@ -39,7 +35,7 @@ public class AccountController {
      */
     @RequestMapping(value = "/{username}/putDataVersion", method = RequestMethod.POST)
     public HttpStatus putDataVersion(@PathVariable String username, @RequestBody Long databaseVersion){
-        boolean isVersionCorrect = accountService.putDataVersion(databaseVersion,username);
+        boolean isVersionCorrect = accountService.actualizeDataVersion(databaseVersion,username);
         return (isVersionCorrect) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE;
     }
 
