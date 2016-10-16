@@ -55,7 +55,7 @@ public class DataService {
 
         //Check for presence of barcode
         for(Barcode barcode : itemFromDatabase.get().getBarcodes()) {
-            if(barcode.getBarcode().equals(barcodeDTO.getBarcode())) return true;
+            if(barcode.getBarcode().equals(barcodeDTO.getBarcode())) return false;
         }
 
         Barcode barcode = barcodeDTO.toBarcode();
