@@ -37,6 +37,9 @@ public class AccountDTO {
         this.email = email;
     }
 
+    public AccountDTO() {
+    }
+
     public Account toAccount(){
         Account account = new Account();
         account.setUsername(username);

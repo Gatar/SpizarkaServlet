@@ -30,6 +30,9 @@ public class BarcodeDTO {
         this.idItemAndroid = idItemAndroid;
     }
 
+    public BarcodeDTO() {
+    }
+
     public Barcode toBarcode(){
         Barcode barcode = new Barcode();
         barcode.setBarcodeValue(this.barcodeValue);

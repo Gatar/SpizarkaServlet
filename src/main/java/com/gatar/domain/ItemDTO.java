@@ -67,6 +67,9 @@ public class ItemDTO {
         this.description = description;
     }
 
+    public ItemDTO() {
+    }
+
     public Item toItem(){
         Item item = new Item();
         item.setTitle(title);

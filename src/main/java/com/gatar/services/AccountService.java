@@ -68,6 +68,11 @@ public class AccountService {
         return receivedAccount.isPresent();
     }
 
+    public void deleteAccount(String username){
+        Optional<Account> receivedAccount = Optional.ofNullable(accountDAO.findByUsername(username));
+        if(receivedAccount.isPresent()) accountDAO.delete(receivedAccount.get());
+    }
+
     /**
      * Possible return info about saving database version or adding new account.
      */
