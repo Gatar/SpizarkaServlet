@@ -31,31 +31,31 @@ public class AccountService {
      * Actualizing version of database for received account.
      * @param dataVersion new version of database
      * @param username to reach correct account
-     * @return true - actualize was correct, false - version of new database is incorrect (MUST be 1 higher than previous)
+     * @return AccountFeedback.AccountDatabaseNumberActualized - database number correctly actualized, AccountFeedback.AccountDatabaseNumberIncorrect - incorrect number (must be 1 higher than previous)
      */
-    public boolean actualizeDataVersion(Long dataVersion, String username){
+    public AccountFeedback actualizeDataVersion(Long dataVersion, String username){
         Account account = getAccount(username);
         if(isVersionCorrect(dataVersion, account)){
             account.setDataVersion(dataVersion);
             accountDAO.save(account);
-            return true;
+            return AccountFeedback.AccountDatabaseNumberActualized;
         }else{
-            return false;
+            return AccountFeedback.AccountDatabaseNumberIncorrect;
         }
     }
 
     /**
      * Creating new account in database.
      * @param accountDTO new account data
-     * @return true - account is created, false - account exists before, it cannot be created one more time
+     * @return AccountFeedback.AccountCreated - account succesufly created, AccountFeedback.AccountAlreadyExist - account with this username exist
      */
-    public boolean saveAccount(AccountDTO accountDTO){
+    public AccountFeedback saveAccount(AccountDTO accountDTO){
         if(!isAccountExist(accountDTO.getUsername())) {
             Account account = accountDTO.toAccount();
             accountDAO.save(account);
-            return true;
+            return AccountFeedback.AccountCreated;
         }else {
-            return false;
+            return AccountFeedback.AccountAlreadyExist;
         }
     }
 
@@ -68,5 +68,13 @@ public class AccountService {
         return receivedAccount.isPresent();
     }
 
-    //TODO dopisać enuma z możliwymi komunikatami błędu
+    /**
+     * Possible return info about saving database version or adding new account.
+     */
+    public enum AccountFeedback{
+        AccountCreated,
+        AccountAlreadyExist,
+        AccountDatabaseNumberActualized,
+        AccountDatabaseNumberIncorrect
+    }
 }

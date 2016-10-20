@@ -35,8 +35,9 @@ public class AccountController {
      */
     @RequestMapping(value = "/{username}/putDataVersion", method = RequestMethod.POST)
     public HttpStatus putDataVersion(@PathVariable String username, @RequestBody Long databaseVersion){
-        boolean isVersionCorrect = accountService.actualizeDataVersion(databaseVersion,username);
-        return (isVersionCorrect) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE;
+        AccountService.AccountFeedback result = accountService.actualizeDataVersion(databaseVersion,username);
+        if(result.equals(AccountService.AccountFeedback.AccountDatabaseNumberActualized)) return HttpStatus.OK;
+        else return HttpStatus.NOT_ACCEPTABLE;
     }
 
     /**

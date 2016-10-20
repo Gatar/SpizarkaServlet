@@ -30,6 +30,7 @@ public class DataService {
      * Save new/update existing item in database. Searching first in database if there exist item.
      * @param itemDTO item data
      * @param username
+     * @return SaveFeedback.UpdatedExistingItem - item exist before in database, has been updated, SaveFeedback.AddedNewItem - new item added to database
      */
     public SaveFeedback saveItem(ItemDTO itemDTO, String username){
         SaveFeedback returnState = SaveFeedback.AddedNewItem;
@@ -51,7 +52,7 @@ public class DataService {
      * Save new barcode. If existing barcode will be find nothing will be saved (to prevent duplication).
      * @param barcodeDTO barcode data
      * @param username
-     * @return true - everything was OK, false - item binded with barcode doesn't exist
+     * @return SaveFeedback.ItemForBarcodeNotExist - item describen in Barcode doesn't exist in database, SaveFeedback.BarcodeAlreadyExist - there are the same barcode for this item in database, SaveFeedback.AddedNewBarcode - barcode added correctly
      */
     public SaveFeedback saveBarcode(BarcodeDTO barcodeDTO, String username){
         Account account = accountService.getAccount(username);
@@ -125,6 +126,9 @@ public class DataService {
         return itemDAO.findByAccount(account);
     }
 
+    /**
+     * Possible return info about saving items and barcodes to database or adding new account.
+     */
     public enum SaveFeedback {
         AddedNewItem,
         UpdatedExistingItem,
