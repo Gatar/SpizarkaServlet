@@ -67,4 +67,6 @@ public class AccountService {
         Optional<Account> receivedAccount = Optional.ofNullable(accountDAO.findByUsername(username));
         return receivedAccount.isPresent();
     }
+
+    //TODO dopisać enuma z możliwymi komunikatami błędu
 }

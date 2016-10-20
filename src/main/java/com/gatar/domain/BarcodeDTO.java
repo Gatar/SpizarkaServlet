@@ -3,23 +3,23 @@ package com.gatar.domain;
 import java.util.Objects;
 
 /**
- * Data Transfer Object used to receive/send one barcode from/to phone.
+ * Data Transfer Object used to receive/send one barcodeValue from/to phone.
  */
 public class BarcodeDTO {
 
-    private String barcode;
+    private String barcodeValue;
 
     /**
      * Item id number assigned in internal database in phone of user.
      */
     private Long idItemAndroid;
 
-    public String getBarcode() {
-        return barcode;
+    public String getBarcodeValue() {
+        return barcodeValue;
     }
 
-    public void setBarcode(String barcode) {
-        this.barcode = barcode;
+    public void setBarcodeValue(String barcodeValue) {
+        this.barcodeValue = barcodeValue;
     }
 
     public Long getIdItemAndroid() {
@@ -32,7 +32,7 @@ public class BarcodeDTO {
 
     public Barcode toBarcode(){
         Barcode barcode = new Barcode();
-        barcode.setBarcode(this.barcode);
+        barcode.setBarcodeValue(this.barcodeValue);
         return barcode;
     }
 
@@ -41,12 +41,12 @@ public class BarcodeDTO {
         if (this == o) return true;
         if (!(o instanceof BarcodeDTO)) return false;
         BarcodeDTO that = (BarcodeDTO) o;
-        return Objects.equals(getBarcode(), that.getBarcode()) &&
+        return Objects.equals(getBarcodeValue(), that.getBarcodeValue()) &&
                 Objects.equals(getIdItemAndroid(), that.getIdItemAndroid());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBarcode(), getIdItemAndroid());
+        return Objects.hash(getBarcodeValue(), getIdItemAndroid());
     }
 }

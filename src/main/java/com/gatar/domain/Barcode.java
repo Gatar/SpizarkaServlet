@@ -3,12 +3,11 @@ package com.gatar.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Barcode entity class. For one item could exists many barcodes, so each barcode are connected by @ManyToOne with Item entity.
+ * Barcode entity class. For one item could exists many barcodes, so each barcodeValue are connected by @ManyToOne with Item entity.
  * If table "BARCODES" doesn't exist, application creates it automaticaly.
  */
 
@@ -21,7 +20,7 @@ public class Barcode implements Serializable{
     private Long idBarcode;
 
     @Column(name="BARCODE")
-    private String barcode;
+    private String barcodeValue;
 
     @ManyToOne
     @JoinColumn(name="ID_ITEM")
@@ -32,12 +31,12 @@ public class Barcode implements Serializable{
     }
 
 
-    public String getBarcode() {
-        return barcode;
+    public String getBarcodeValue() {
+        return barcodeValue;
     }
 
-    public void setBarcode(String barcode) {
-        this.barcode = barcode;
+    public void setBarcodeValue(String barcodeValue) {
+        this.barcodeValue = barcodeValue;
     }
 
     public Long getIdBarcode() {
@@ -58,7 +57,7 @@ public class Barcode implements Serializable{
 
     public BarcodeDTO toBarcodeDTO(){
         BarcodeDTO barcodeDTO = new BarcodeDTO();
-        barcodeDTO.setBarcode(barcode);
+        barcodeDTO.setBarcodeValue(barcodeValue);
         barcodeDTO.setIdItemAndroid(item.getIdItemAndroid());
         return barcodeDTO;
     }

@@ -31,13 +31,20 @@ public class DataService {
      * @param itemDTO item data
      * @param username
      */
-    public void saveItem(ItemDTO itemDTO, String username){
+    public SaveFeedback saveItem(ItemDTO itemDTO, String username){
+        SaveFeedback returnState = SaveFeedback.AddedNewItem;
         Account account = accountService.getAccount(username);
         Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(itemDTO.getIdItemAndroid(),account));
+
         Item item = itemDTO.toItem();
-        if(itemFromDatabase.isPresent()) item.setIdItem(itemFromDatabase.get().getIdItem());
         item.setAccount(accountService.getAccount(username));
+
+        if(itemFromDatabase.isPresent()) {
+            item.setIdItem(itemFromDatabase.get().getIdItem());
+            returnState = SaveFeedback.UpdatedExistingItem;
+        }
         itemDAO.save(item);
+        return  returnState;
     }
 
     /**
@@ -46,22 +53,23 @@ public class DataService {
      * @param username
      * @return true - everything was OK, false - item binded with barcode doesn't exist
      */
-    public boolean saveBarcode(BarcodeDTO barcodeDTO, String username){
+    public SaveFeedback saveBarcode(BarcodeDTO barcodeDTO, String username){
         Account account = accountService.getAccount(username);
 
         //Check for presence of item
         Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(barcodeDTO.getIdItemAndroid(),account));
-        if(!itemFromDatabase.isPresent()) return false;
+        if(!itemFromDatabase.isPresent()) return SaveFeedback.ItemForBarcodeNotExist;
 
-        //Check for presence of barcode
-        for(Barcode barcode : itemFromDatabase.get().getBarcodes()) {
-            if(barcode.getBarcode().equals(barcodeDTO.getBarcode())) return false;
+        //Check for presence of barcode value
+        List<Barcode> barcodesFromItem = itemFromDatabase.get().getBarcodes();
+        for(Barcode barcode : barcodesFromItem) {
+            if(barcode.getBarcodeValue().equals(barcodeDTO.getBarcodeValue())) return SaveFeedback.BarcodeAlreadyExist;
         }
 
         Barcode barcode = barcodeDTO.toBarcode();
         barcode.setItem(itemDAO.findByIdItemAndroidAndAccount(barcodeDTO.getIdItemAndroid(), account));
         barcodeDAO.save(barcode);
-        return true;
+        return SaveFeedback.AddedNewBarcode;
     }
 
     /**
@@ -75,7 +83,7 @@ public class DataService {
         for(Item item : items){
             for(Barcode barcode : item.getBarcodes()){
                 BarcodeDTO actualBarcodeDTO = new BarcodeDTO();
-                actualBarcodeDTO.setBarcode(barcode.getBarcode());
+                actualBarcodeDTO.setBarcodeValue(barcode.getBarcodeValue());
                 actualBarcodeDTO.setIdItemAndroid(item.getIdItemAndroid());
 
                 barcodeDTOs.add(actualBarcodeDTO);
@@ -115,5 +123,13 @@ public class DataService {
     private List<Item> getItemListByUser(String username){
         Account account = accountService.getAccount(username);
         return itemDAO.findByAccount(account);
+    }
+
+    public enum SaveFeedback {
+        AddedNewItem,
+        UpdatedExistingItem,
+        AddedNewBarcode,
+        BarcodeAlreadyExist,
+        ItemForBarcodeNotExist
     }
 }

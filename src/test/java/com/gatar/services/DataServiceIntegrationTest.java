@@ -18,9 +18,10 @@ import java.util.stream.Collectors;
  * Test all functionalties from DataService with use of database connected with application.
  *
  * Adding to database data using DTO objects:
- * 1. Create two accounts
- * 2. Add items for accounts (both: unique and the same for both accounts)
- * 3. Add barcodes for each items (as above and sigle/multiple barcodes for each item)
+ * 1. Clean all database (once, at the begining)
+ * 2. Create two accounts
+ * 3. Add items for accounts (both: unique and the same for both accounts)
+ * 4. Add barcodes for each items (as above and sigle/multiple barcodes for each item)
  *
  * Getting data from database as DTO objects:
  * 1. Get all items for each user
@@ -36,6 +37,8 @@ import java.util.stream.Collectors;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class DataServiceIntegrationTest {
+
+    public static boolean firstTest = true;
 
     @Autowired
     DataService dataService;
@@ -54,8 +57,8 @@ public class DataServiceIntegrationTest {
 
     private String username1 = "user1";
     private String username2 = "user2";
-    private AccountDTO accountDTO = new AccountDTO();
-    private AccountDTO accountDTO2 = new AccountDTO();
+    private AccountDTO accountDTOuser1 = new AccountDTO();
+    private AccountDTO accountDTOuser2 = new AccountDTO();
     private ItemDTO sampleItem = new ItemDTO();
     private ItemDTO sampleItem2 = new ItemDTO();
     private ItemDTO sampleItem3 = new ItemDTO();
@@ -67,18 +70,24 @@ public class DataServiceIntegrationTest {
     private BarcodeDTO sampleBarcode4  = new BarcodeDTO();
     private BarcodeDTO sampleBarcodeFakeItem  = new BarcodeDTO();
 
-    //TODO zrobić to usuwanie bazy danych na początku i końcu
 
     @Before
     public void fillSamplesWithData(){
 
-            accountDTO.setUsername(username1);
-            accountDTO.setEmail("email@email.com");
-            accountDTO.setPassword("pass1");
+            if(firstTest){
+                barcodeDAO.deleteAll();
+                itemDAO.deleteAll();
+                accountDAO.deleteAll();
+                firstTest = false;
+            }
 
-            accountDTO2.setUsername(username2);
-            accountDTO2.setEmail("email2@email.com");
-            accountDTO2.setPassword("pass2");
+            accountDTOuser1.setUsername(username1);
+            accountDTOuser1.setEmail("email@email.com");
+            accountDTOuser1.setPassword("pass1");
+
+            accountDTOuser2.setUsername(username2);
+            accountDTOuser2.setEmail("email2@email.com");
+            accountDTOuser2.setPassword("pass2");
 
             sampleItem.setQuantity(10);
             sampleItem.setIdItemAndroid(1L);
@@ -116,37 +125,36 @@ public class DataServiceIntegrationTest {
             sampleItem5.setCategory("Category 5");
 
             sampleBarcode.setIdItemAndroid(1L);
-            sampleBarcode.setBarcode("1abcd");
+            sampleBarcode.setBarcodeValue("1abcd");
 
             sampleBarcode2.setIdItemAndroid(1L);
-            sampleBarcode2.setBarcode("2abcd");
+            sampleBarcode2.setBarcodeValue("2abcd");
 
             sampleBarcode3.setIdItemAndroid(2L);
-            sampleBarcode3.setBarcode("3abcd");
+            sampleBarcode3.setBarcodeValue("3abcd");
 
             sampleBarcode4.setIdItemAndroid(2L);
-            sampleBarcode4.setBarcode("4abcd");
+            sampleBarcode4.setBarcodeValue("4abcd");
 
             sampleBarcodeFakeItem.setIdItemAndroid(8L);
-            sampleBarcodeFakeItem.setBarcode("5abcd");
+            sampleBarcodeFakeItem.setBarcodeValue("5abcd");
 
-            accountService.saveAccount(accountDTO);
-            accountService.saveAccount(accountDTO2);
+            accountService.saveAccount(accountDTOuser1);
+            accountService.saveAccount(accountDTOuser2);
     }
 
     @Test
     public void saveItem() throws Exception {
-        dataService.saveItem(sampleItem,username1);
-        dataService.saveItem(sampleItem,username2);
-        dataService.saveItem(sampleItem2,username1);
-        dataService.saveItem(sampleItem3,username2);
-        dataService.saveItem(sampleItem4,username1);
-        dataService.saveItem(sampleItem4,username2);
-        dataService.saveItem(sampleItem5,username2);
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem,username1));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem,username2));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem2,username1));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem3,username2));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem4,username1));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem4,username2));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem5,username2));
 
-        //try to add one more time the same Items
-        dataService.saveItem(sampleItem,username1);
-        dataService.saveItem(sampleItem,username2);
+        Assert.assertEquals(DataService.SaveFeedback.UpdatedExistingItem,dataService.saveItem(sampleItem,username1));
+        Assert.assertEquals(DataService.SaveFeedback.UpdatedExistingItem,dataService.saveItem(sampleItem,username2));
 
         Assert.assertEquals(sampleItem,itemDAO.findByIdItemAndroidAndAccount(1L,accountDAO.findByUsername(username1)).toItemDTO());
         Assert.assertEquals(sampleItem2,itemDAO.findByIdItemAndroidAndAccount(2L,accountDAO.findByUsername(username1)).toItemDTO());
@@ -160,20 +168,18 @@ public class DataServiceIntegrationTest {
     @Test
     public void saveBarcode() throws Exception {
 
-        Assert.assertTrue(dataService.saveBarcode(sampleBarcode,username1));
-        Assert.assertTrue(dataService.saveBarcode(sampleBarcode,username2));
-        Assert.assertTrue(dataService.saveBarcode(sampleBarcode3,username1));
-        Assert.assertTrue(dataService.saveBarcode(sampleBarcode2,username2));
-        Assert.assertTrue(dataService.saveBarcode(sampleBarcode3,username2));
-        Assert.assertTrue(dataService.saveBarcode(sampleBarcode4,username2));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode,username1));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode,username2));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode3,username1));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode2,username2));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode3,username2));
+        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode4,username2));
 
-        //Try to add one more time the same Barcodes
-        Assert.assertFalse(dataService.saveBarcode(sampleBarcode,username1));
-        Assert.assertFalse(dataService.saveBarcode(sampleBarcode,username2));
+        Assert.assertEquals(DataService.SaveFeedback.BarcodeAlreadyExist,dataService.saveBarcode(sampleBarcode,username1));
+        Assert.assertEquals(DataService.SaveFeedback.BarcodeAlreadyExist,dataService.saveBarcode(sampleBarcode,username2));
 
-        //Try to add barcodes to non-existing items
-        Assert.assertFalse(dataService.saveBarcode(sampleBarcodeFakeItem,username1));
-        Assert.assertFalse(dataService.saveBarcode(sampleBarcodeFakeItem,username2));
+        Assert.assertEquals(DataService.SaveFeedback.ItemForBarcodeNotExist,dataService.saveBarcode(sampleBarcodeFakeItem,username1));
+        Assert.assertEquals(DataService.SaveFeedback.ItemForBarcodeNotExist,dataService.saveBarcode(sampleBarcodeFakeItem,username2));
 
     }
 
