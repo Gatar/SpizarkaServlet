@@ -59,7 +59,7 @@ public class DataServiceUnitTest {
         MockitoAnnotations.initMocks(this);
 
         testAccountDTO.setUsername(testUsername);
-        testAccountDTO.setEmail("email@email.com");
+        testAccountDTO.setEmail("gatar@interia.pl");
         testAccountDTO.setPassword("pass1");
 
         testUserAccount = testAccountDTO.toAccount();

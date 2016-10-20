@@ -1,5 +1,8 @@
 package com.gatar.services;
 
+/**
+ * Mail account settings. I've used for my private purpose Gmail account.
+ */
 interface EmailServiceSettings {
     String SENDING_FROM = "gatar.webserivces@gmail.com";
     String EMAIL_ACCOUNT_LOGIN = "gatar.webserivces@gmail.com";
