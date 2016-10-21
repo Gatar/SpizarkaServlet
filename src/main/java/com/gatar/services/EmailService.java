@@ -16,11 +16,11 @@ import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Service for sending an emails from predefined, outer email account (settings are in {@see EmailServiceSettings}).
+ * Service for sending an emails from predefined, outer email account (settings are in {@see EmailServiceInterface}).
  * Everything is set for GMail email, but can be easily changed in interface.
  */
 @Service
-public class EmailService implements EmailServiceSettings{
+public class EmailService implements EmailServiceInterface {
 
     @Autowired
     DataService dataService;

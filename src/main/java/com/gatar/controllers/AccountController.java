@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.annotation.ServletSecurity;
-
 @RestController
 public class AccountController {
 
@@ -36,7 +34,7 @@ public class AccountController {
      * @param databaseVersion new version of database after some modification in phone
      * @return HttpStatus.OK - if version is one higher than version in database (ex. new 3453, old 3452), HttpStatus.NOT_ACCEPTABLE if version difference is other
      */
-    @RequestMapping(value = "/{username}/putDataVersion", method = RequestMethod.POST)
+    @RequestMapping(value = "/{username}/putDataVersion", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<Long> putDataVersion(@PathVariable String username, @RequestBody Long databaseVersion){
         AccountService.AccountFeedback responseAccountSerivce = accountService.actualizeDataVersion(databaseVersion,username);
 
@@ -67,11 +65,12 @@ public class AccountController {
      * @return HttpStatus.OK when everything was OK
      */
     @RequestMapping(value = "/{username}/rememberAccountData")
-    public HttpStatus sendEmailWithAccountData(@PathVariable String username){
-        return emailService.sendAccountDataRemember(username);
+    public ResponseEntity<AccountDTO> sendEmailWithAccountData(@PathVariable String username){
+        HttpStatus status = emailService.sendAccountDataRemember(username);
+        return new ResponseEntity<AccountDTO>(status);
+
     }
 
-    //TODO Tylko do testów, finalnie usunąć
     @RequestMapping(value = "/{username}/delete")
     private HttpStatus deleteAccount(@PathVariable String username){
         accountService.deleteAccount(username);

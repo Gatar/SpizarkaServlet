@@ -1,11 +1,12 @@
 package com.gatar.domain;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Data Transfer Object used to receive registration data from user phone.
  */
-public class AccountDTO {
+public class AccountDTO implements Serializable{
 
     private String username;
 

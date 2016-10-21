@@ -1,13 +1,14 @@
 package com.gatar.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
 @Entity(name = "ACCOUNTS")
-public class Account implements Serializable {
+public class Account implements Serializable, GrantedAuthority {
 
     @Id
     @Column(name = "ID_USER")
@@ -41,12 +42,23 @@ public class Account implements Serializable {
     public Account() {
     }
 
+    public Account(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     public AccountDTO toAccountDTO(){
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setUsername(username);
         accountDTO.setPassword(password);
         accountDTO.setEmail(email);
         return accountDTO;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getAuthority() {
+        return "USER";
     }
 
     public Integer getUserID() {

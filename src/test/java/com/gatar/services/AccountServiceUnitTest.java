@@ -70,13 +70,4 @@ public class AccountServiceUnitTest {
         Assert.assertEquals(AccountService.AccountFeedback.AccountAlreadyExist,existingAccount);
     }
 
-    @Test
-    public void isAccountExist() throws Exception {
-        Mockito.when(accountDAO.findByUsername(testUsername)).thenReturn(testUserAccount);
-        Mockito.when(accountDAO.findByUsername(testUsername2)).thenReturn(null);
-
-        Assert.assertTrue(accountService.isAccountExist(testUsername));
-        Assert.assertFalse(accountService.isAccountExist(testUsername2));
-    }
-
 }

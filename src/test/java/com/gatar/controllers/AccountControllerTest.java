@@ -3,8 +3,10 @@ package com.gatar.controllers;
 import com.gatar.domain.AccountDTO;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,10 +20,16 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AccountControllerTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class AccountControllerTest{
 
     private String testUsername = "userTest";
     private AccountDTO testAccountDTO = new AccountDTO();
+    private HttpHeaders httpHeadersTestAccount;
+    private HttpHeaders httpHeadersWrongPassword;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
 
     @Before
     public void setupMock(){
@@ -30,6 +38,9 @@ public class AccountControllerTest {
         testAccountDTO.setUsername(testUsername);
         testAccountDTO.setEmail("email@email.com");
         testAccountDTO.setPassword("pass1");
+
+        httpHeadersTestAccount = getHeaders(testAccountDTO.getUsername(),testAccountDTO.getPassword());
+        httpHeadersWrongPassword = getHeaders(testAccountDTO.getUsername(),"badPassword");
     }
 
     private HttpHeaders getHeaders(String username, String pass){
@@ -42,42 +53,80 @@ public class AccountControllerTest {
         return headers;
     }
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-
     @Test
-    public void getDataVersion() throws Exception {
+    public void count1addNewAccount() throws Exception {
+        final String URIaddNewAccount = "/addNewAccount";
 
-    }
-
-    @Test
-    public void putDataVersion() throws Exception {
-
-    }
-
-    @Test
-    public void addNewAccount() throws Exception {
-        final String URI = "/addNewAccount";
-        HttpEntity<Object> request = new HttpEntity<>(testAccountDTO,getHeaders(testAccountDTO.getUsername(),testAccountDTO.getPassword()));
-        ResponseEntity<AccountDTO> responseEntity = restTemplate.postForEntity(URI,request,AccountDTO.class);
+        HttpEntity<AccountDTO> request = new HttpEntity<>(testAccountDTO,httpHeadersTestAccount);
+        ResponseEntity<AccountDTO> responseEntity = restTemplate.postForEntity(URIaddNewAccount,request,AccountDTO.class);
         AccountDTO receivedAccount = responseEntity.getBody();
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(receivedAccount,testAccountDTO);
 
-        responseEntity = restTemplate.postForEntity(URI,request,AccountDTO.class);
-
+        responseEntity = restTemplate.postForEntity(URIaddNewAccount,request,AccountDTO.class);
         assertEquals(HttpStatus.NOT_ACCEPTABLE,responseEntity.getStatusCode());
-
-        //TODO Cos zrobić z tym deletem
-        HttpEntity<Object> requestDelete = new HttpEntity<>(HttpStatus.OK,getHeaders("gatar","password"));
-        ResponseEntity<HttpStatus> delete = restTemplate.postForEntity("/"+testAccountDTO.getUsername()+"/delete",requestDelete,HttpStatus.class);
-        assertEquals(HttpStatus.OK,delete.getStatusCode());
     }
 
     @Test
-    public void sendEmailWithAccountData() throws Exception {
+    public void count2putDataVersion() throws Exception {
+        final String URIputDataVersion = "/"+testAccountDTO.getUsername()+"/putDataVersion";
+        Long firstVersion = 5L;
+        Long correctNewVersion = 6L;
+        Long previousVersion = 1L;
+        Long toHighVersion = 100L;
 
+        HttpEntity<Long> requestFirstVersion = new HttpEntity<>(firstVersion,httpHeadersTestAccount);
+        HttpEntity<Long> requestCorrectNewVersion = new HttpEntity<>(correctNewVersion,httpHeadersTestAccount);
+        HttpEntity<Long> requestTooHighVersion = new HttpEntity<>(toHighVersion,httpHeadersTestAccount);
+        HttpEntity<Long> requestTooLowVersion = new HttpEntity<>(previousVersion,httpHeadersTestAccount);
+        HttpEntity<Long> requestWrongPassword = new HttpEntity<>(previousVersion,httpHeadersWrongPassword);
+
+        ResponseEntity<Long> responseFirstVersion = restTemplate.postForEntity(URIputDataVersion,requestFirstVersion,Long.class);
+        ResponseEntity<Long> responseCorrectNewVersion = restTemplate.postForEntity(URIputDataVersion,requestCorrectNewVersion,Long.class);
+        ResponseEntity<Long> responseTooHighVersion = restTemplate.postForEntity(URIputDataVersion,requestTooHighVersion,Long.class);
+        ResponseEntity<Long> responseTooLowVersion = restTemplate.postForEntity(URIputDataVersion,requestTooLowVersion,Long.class);
+        ResponseEntity<Long> responseWrongPassword = restTemplate.postForEntity(URIputDataVersion,requestWrongPassword,Long.class);
+
+
+        Long receivedDatabaseVersion = responseFirstVersion.getBody();
+        assertEquals(HttpStatus.OK,responseFirstVersion.getStatusCode());
+        assertEquals(firstVersion,receivedDatabaseVersion);
+
+        receivedDatabaseVersion = responseCorrectNewVersion.getBody();
+        assertEquals(HttpStatus.OK,responseCorrectNewVersion.getStatusCode());
+        assertEquals(correctNewVersion,receivedDatabaseVersion);
+
+        receivedDatabaseVersion = responseTooHighVersion.getBody();
+        assertEquals(HttpStatus.NOT_ACCEPTABLE,responseTooHighVersion.getStatusCode());
+        assertEquals(correctNewVersion,receivedDatabaseVersion);
+
+        receivedDatabaseVersion = responseTooLowVersion.getBody();
+        assertEquals(HttpStatus.NOT_ACCEPTABLE,responseTooLowVersion.getStatusCode());
+        assertEquals(correctNewVersion,receivedDatabaseVersion);
+
+        receivedDatabaseVersion = responseWrongPassword.getBody();
+        assertEquals(HttpStatus.FORBIDDEN,responseWrongPassword.getStatusCode());
+        assertEquals(null,receivedDatabaseVersion);
+
+
+    }
+
+    @Test
+    public void count3getDataVersion() throws Exception {
+
+    }
+
+    @Test
+    public void count4sendEmailWithAccountData() throws Exception {
+
+    }
+
+    @Test
+    public void count5deleteAccount() throws Exception{
+        HttpEntity<Object> requestDelete = new HttpEntity<>(HttpStatus.OK,httpHeadersTestAccount);
+        ResponseEntity<HttpStatus> delete = restTemplate.postForEntity("/"+testAccountDTO.getUsername()+"/delete",requestDelete,HttpStatus.class);
+        assertEquals(HttpStatus.OK,delete.getStatusCode());
     }
 
 }
