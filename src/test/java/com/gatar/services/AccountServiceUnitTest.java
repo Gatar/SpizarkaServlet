@@ -49,9 +49,9 @@ public class AccountServiceUnitTest {
         Long previousVersion = 1L;
         Long toHighVersion = 100L;
 
-        AccountService.AccountFeedback correct = accountService.actualizeDataVersion(correctNewVersion,testUsername);
-        AccountService.AccountFeedback toLow = accountService.actualizeDataVersion(previousVersion,testUsername);
-        AccountService.AccountFeedback toHigh = accountService.actualizeDataVersion(toHighVersion,testUsername);
+        AccountService.AccountFeedback correct = accountService.putDataVersion(correctNewVersion,testUsername);
+        AccountService.AccountFeedback toLow = accountService.putDataVersion(previousVersion,testUsername);
+        AccountService.AccountFeedback toHigh = accountService.putDataVersion(toHighVersion,testUsername);
 
         Assert.assertEquals(AccountService.AccountFeedback.AccountDatabaseNumberActualized,correct);
         Assert.assertEquals(AccountService.AccountFeedback.AccountDatabaseNumberIncorrect,toLow);

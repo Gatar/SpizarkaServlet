@@ -3,10 +3,9 @@ package com.gatar.security;
 import com.gatar.database.AccountDAO;
 import com.gatar.domain.Account;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -14,51 +13,68 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.util.AntPathMatcher;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-import java.util.Properties;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter implements SecurityConfigurationInterface{
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-	private final static String REALM = "SPIZARKA_REALM";
+    private final static String REALM = "SPIZARKA_REALM";
 
-	@Autowired
+    @Autowired
     AccountDAO accountDAO;
 
-	@Autowired
-	public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception{
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-		auth.inMemoryAuthentication().withUser(adminAccount.getUsername()).password(adminAccount.getPassword()).roles("ADMIN");
 
-		List<Account> registeredAccounts = accountDAO.findAll();
-		for(Account account : registeredAccounts){
-            final String role = account.getAuthority();
-			auth.inMemoryAuthentication().withUser(account.getUsername()).password(account.getPassword()).roles(role);
-		}
-	}
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+        http.httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint()).and().
+        sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf().disable();
 
-		http.csrf().disable()
-				.authorizeRequests()
-				.antMatchers("/*/**").hasAnyRole("USER","ADMIN")
-				.and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
-				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-	}
+        for(Account account: accountDAO.findAll()){
+            http.authorizeRequests().antMatchers("/"+account.getUsername()+"/**").hasRole(account.getRole());
+        }
+        http.authorizeRequests()
+                .antMatchers("/accounts").hasRole("ADMIN")
+                .antMatchers("/barcodes").hasRole("ADMIN")
+                .antMatchers("/items").hasRole("ADMIN")
+                .antMatchers("/profile").hasRole("ADMIN");
+    }
 
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/addNewAccount");
-	}
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/addNewAccount");
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authProvider());
+    }
+
 
 	@Bean
 	public CustomBasicAuthenticationEntryPoint getBasicAuthEntryPoint(){
 		return new CustomBasicAuthenticationEntryPoint();
 	}
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
 }

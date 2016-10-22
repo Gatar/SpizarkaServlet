@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,6 +24,7 @@ public class EmailService implements EmailServiceInterface {
 
     @Autowired
     AccountService accountService;
+
 
     /**
      * Sending shopping list (items with quantity below minimum).
@@ -51,8 +49,8 @@ public class EmailService implements EmailServiceInterface {
 
     }
     /**
-     * Sending shopping list (items with quantity below minimum) to email input by user in phone app.
-     * @param username username of list
+     * Sending Account data to email, which is binded to Account. Password are reseted to random 6-digit string.
+     * @param username username for reset password
      * @return return HttpStatus.OK when everything was OK and HttpStatus.CONFLICT if there were Exceptions in sendEmail method.
      */
     public HttpStatus sendAccountDataRemember(String username){
@@ -63,11 +61,30 @@ public class EmailService implements EmailServiceInterface {
         if(!accountFromDatabase.isPresent()) return HttpStatus.NOT_ACCEPTABLE;
 
         Account account = accountFromDatabase.get();
+        content.append("\t Wersja danych w bazie: \t" + account.getDataVersion().toString() + "\n\n");
         content.append("\t Login: \t\t" + username + "\n");
-        content.append("\t Hasło: \t\t" + account.getPassword() + "\n");
-        content.append("\t Wersja danych w bazie: \t" + account.getDataVersion().toString() + "\n");
+        content.append("\t Hasło: \t\t" + resetAccountPassword(username) + "\n");
+
 
         return (sendEmail(account.getEmail(),subject,content.toString()))? HttpStatus.OK : HttpStatus.CONFLICT;
+    }
+
+    private String resetAccountPassword(String username){
+        String newPassword = generateRandomPassword();
+        accountService.changePassword(newPassword,username);
+        return  newPassword;
+    }
+
+    private String generateRandomPassword(){
+        Random randomGenereator = new Random();
+        StringBuilder newPassword = new StringBuilder();
+
+        for(int count = 0; count < 6; count++){
+            int digit = randomGenereator.nextInt(10);
+            newPassword.append(digit);
+        }
+
+        return newPassword.toString();
     }
 
     private boolean sendEmail(String recipietEmail, String subject, String content){

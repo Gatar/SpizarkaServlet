@@ -3,19 +3,10 @@ package com.gatar.services;
 import com.gatar.database.AccountDAO;
 import com.gatar.domain.Account;
 import com.gatar.domain.AccountDTO;
-import com.gatar.security.SecurityConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.UserDetailsManagerConfigurer;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,6 +18,8 @@ public class AccountService {
     @Autowired
     AccountDAO accountDAO;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     /**
      * Get single account from database, based on username.
@@ -46,7 +39,9 @@ public class AccountService {
      * @param username    to reach correct account
      * @return AccountFeedback.AccountDatabaseNumberActualized - database number correctly actualized, AccountFeedback.AccountDatabaseNumberIncorrect - incorrect number (must be 1 higher than previous)
      */
-    public AccountFeedback actualizeDataVersion(Long dataVersion, String username) {
+    public AccountFeedback putDataVersion(Long dataVersion, String username) {
+        if(!isAccountExist(username)) return AccountFeedback.AccountDoesntExist;
+
         Account account = getAccount(username);
         if (isVersionCorrect(dataVersion, account)) {
             account.setDataVersion(dataVersion);
@@ -58,7 +53,35 @@ public class AccountService {
     }
 
     /**
-     * Creating new account in database.
+     * Return database version. If account doesn't exist return -1.
+     * @param username Account username
+     * @return database version
+     */
+    public Long getDataVersion(String username){
+        if(!isAccountExist(username)) return -1L;
+        return getAccount(username).getDataVersion();
+    }
+
+    /**
+     * Chenge Account password in database.
+     *
+     * @param newPassword new password
+     * @param username username of Account
+     * @return AccountFeedback.AccountPasswordActualized - password actualized, AccountFeedback.AccountDoesntExist - account doesn't exist
+     */
+    public AccountFeedback changePassword(String newPassword, String username){
+        if (isAccountExist(username)){
+            Account account = getAccount(username);
+            account.setPassword(passwordEncoder.encode(newPassword));
+            accountDAO.save(account);
+            return AccountFeedback.AccountPasswordActualized;
+        } else {
+            return AccountFeedback.AccountDoesntExist;
+        }
+    }
+
+    /**
+     * Creating new account in database or actualize existing Account.
      *
      * @param accountDTO new account data
      * @return AccountFeedback.AccountCreated - account succesufly created, AccountFeedback.AccountAlreadyExist - account with this username exist
@@ -66,25 +89,21 @@ public class AccountService {
     public AccountFeedback saveAccount(AccountDTO accountDTO) {
         if (!isAccountExist(accountDTO.getUsername())) {
             Account account = accountDTO.toAccount();
+            account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
             accountDAO.save(account);
-            addAccountToSecurityConfiguration(account);
             return AccountFeedback.AccountCreated;
         } else {
             return AccountFeedback.AccountAlreadyExist;
         }
     }
 
+    /**
+     * Delete from database Account described by username.
+     * @param username of Account to delete.
+     */
     public void deleteAccount(String username) {
         Optional<Account> receivedAccount = Optional.ofNullable(accountDAO.findByUsername(username));
         if (receivedAccount.isPresent()) accountDAO.delete(receivedAccount.get());
-    }
-
-    private void addAccountToSecurityConfiguration(Account account) {
-        List<GrantedAuthority> updatedAuthorities = new ArrayList<GrantedAuthority>();
-        updatedAuthorities.add(account);
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(account.getUsername(), account.getPassword(), updatedAuthorities);
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-
     }
 
     private boolean isVersionCorrect(Long dataVersion, Account account) {
@@ -105,6 +124,8 @@ public class AccountService {
         AccountCreated,
         AccountAlreadyExist,
         AccountDatabaseNumberActualized,
-        AccountDatabaseNumberIncorrect
+        AccountDatabaseNumberIncorrect,
+        AccountPasswordActualized,
+        AccountDoesntExist
     }
 }

@@ -1,14 +1,13 @@
 package com.gatar.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
 @Entity(name = "ACCOUNTS")
-public class Account implements Serializable, GrantedAuthority {
+public class Account implements Serializable {
 
     @Id
     @Column(name = "ID_USER")
@@ -35,8 +34,12 @@ public class Account implements Serializable, GrantedAuthority {
     @Column(name = "DATA_VERSION")
     private Long dataVersion;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    /**
+     * Contains always "USER", implement for authorities purpose.
+     */
+
     @JsonIgnore
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Item> items;
 
     public Account() {
@@ -55,10 +58,13 @@ public class Account implements Serializable, GrantedAuthority {
         return accountDTO;
     }
 
-    @Override
-    @JsonIgnore
-    public String getAuthority() {
-        return "USER";
+    /**
+     * As ROLE for each user there is used its unique username. Example: when someone tries to access with useename Fred to path /George/getAllItems,
+     * Fred account ROLE will be also 'Fred' and access to /George/** path require ROLE 'George', so access will be denited.
+     * @return username as role.
+     */
+    public String getRole() {
+        return username;
     }
 
     public Integer getUserID() {
