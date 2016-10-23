@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertNotNull;
 
-public class DataServiceUnitTest {
+public class DataServiceImplUnitTest {
 
     @InjectMocks
-    private DataService dataService;
+    private DataServiceImpl dataServiceImpl;
 
     @Spy
-    private AccountService accountService;
+    private AccountServiceImpl accountServiceImpl;
 
     @Mock
     private ItemDAO itemDAO;
@@ -55,7 +55,7 @@ public class DataServiceUnitTest {
 
     @Before
     public void setupMock() {
-        dataService = new DataService();
+        dataServiceImpl = new DataServiceImpl();
         MockitoAnnotations.initMocks(this);
 
         testAccountDTO.setUsername(testUsername);
@@ -63,7 +63,7 @@ public class DataServiceUnitTest {
         testAccountDTO.setPassword("pass1");
 
         testUserAccount = testAccountDTO.toAccount();
-        Mockito.doReturn(testUserAccount).when(accountService).getAccount(testUsername);
+        Mockito.doReturn(testUserAccount).when(accountServiceImpl).getAccount(testUsername);
 
         sampleItemDTO1.setQuantity(10);
         sampleItemDTO1.setIdItemAndroid(1L);
@@ -118,11 +118,11 @@ public class DataServiceUnitTest {
         Mockito.when(itemDAO.findByIdItemAndroidAndAccount(itemExisted.getIdItemAndroid(), testUserAccount)).thenReturn(itemExisted);
         Mockito.when(itemDAO.findByIdItemAndroidAndAccount(itemNew.getIdItemAndroid(), testUserAccount)).thenReturn(null);
 
-        DataService.SaveFeedback saveExistingItem = dataService.saveItem(sampleItemDTO1, testUsername);
-        DataService.SaveFeedback saveNewItem = dataService.saveItem(sampleItemDTO2, testUsername);
+        DataServiceImpl.SaveFeedback saveExistingItem = dataServiceImpl.saveItem(sampleItemDTO1, testUsername);
+        DataServiceImpl.SaveFeedback saveNewItem = dataServiceImpl.saveItem(sampleItemDTO2, testUsername);
 
-        Assert.assertEquals(DataService.SaveFeedback.UpdatedExistingItem,saveExistingItem);
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,saveNewItem);
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.UpdatedExistingItem,saveExistingItem);
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem,saveNewItem);
 
     }
 
@@ -141,7 +141,7 @@ public class DataServiceUnitTest {
         Mockito.when(itemDAO.findByAccount(testUserAccount)).thenReturn(user1Items);
 
         List<BarcodeDTO> user1BarcodeDTO = Arrays.asList(sampleBarcode1,sampleBarcode2,sampleBarcode3);
-        List<BarcodeDTO> user1AllBarcodes = dataService.getAllBarcodes(testUsername);
+        List<BarcodeDTO> user1AllBarcodes = dataServiceImpl.getAllBarcodes(testUsername);
 
         Assert.assertEquals(user1BarcodeDTO,user1AllBarcodes);
 
@@ -154,7 +154,7 @@ public class DataServiceUnitTest {
         testUserAccount.setItems(user1Items);
         Mockito.when(itemDAO.findByAccount(testUserAccount)).thenReturn(user1Items);
 
-        List<ItemDTO> user1AllItems = dataService.getAllItems(testUsername);
+        List<ItemDTO> user1AllItems = dataServiceImpl.getAllItems(testUsername);
 
         Assert.assertEquals(user1ItemsDTO,user1AllItems);
     }
@@ -168,14 +168,14 @@ public class DataServiceUnitTest {
         Mockito.when(itemDAO.findByIdItemAndroidAndAccount(sampleBarcode1.getIdItemAndroid(), testUserAccount)).thenReturn(itemExist);
         Mockito.when(itemDAO.findByIdItemAndroidAndAccount(sampleBarcodeFakeItem.getIdItemAndroid(), testUserAccount)).thenReturn(itemNotExist);
 
-        DataService.SaveFeedback saveToExistingItemWithoutThisBarcode = dataService.saveBarcode(sampleBarcode1, testUsername);
+        DataServiceImpl.SaveFeedback saveToExistingItemWithoutThisBarcode = dataServiceImpl.saveBarcode(sampleBarcode1, testUsername);
         itemExist.setBarcodes(Arrays.asList(sampleBarcode1.toBarcode()));
-        DataService.SaveFeedback saveToExistingItemWithThisBarcode = dataService.saveBarcode(sampleBarcode1, testUsername);
-        DataService.SaveFeedback saveToNonExistingItem = dataService.saveBarcode(sampleBarcodeFakeItem, testUsername);
+        DataServiceImpl.SaveFeedback saveToExistingItemWithThisBarcode = dataServiceImpl.saveBarcode(sampleBarcode1, testUsername);
+        DataServiceImpl.SaveFeedback saveToNonExistingItem = dataServiceImpl.saveBarcode(sampleBarcodeFakeItem, testUsername);
 
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,saveToExistingItemWithoutThisBarcode);
-        Assert.assertEquals(DataService.SaveFeedback.BarcodeAlreadyExist,saveToExistingItemWithThisBarcode);
-        Assert.assertEquals(DataService.SaveFeedback.ItemForBarcodeNotExist,saveToNonExistingItem);
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewBarcode,saveToExistingItemWithoutThisBarcode);
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.BarcodeAlreadyExist,saveToExistingItemWithThisBarcode);
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.ItemForBarcodeNotExist,saveToNonExistingItem);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class DataServiceUnitTest {
 
         Mockito.when(itemDAO.findByAccount(testUserAccount)).thenReturn(user1Items);
         List<Item> itemsWithQuantityBelowMinimum = Arrays.asList(sampleItemDTO2.toItem(),sampleItemDTO3.toItem());
-        List<Item> shoppingList = dataService.getShoppingList(testUsername);
+        List<Item> shoppingList = dataServiceImpl.getShoppingList(testUsername);
 
         Assert.assertEquals(itemsWithQuantityBelowMinimum,shoppingList);
     }

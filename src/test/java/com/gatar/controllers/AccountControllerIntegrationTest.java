@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class AccountControllerTest{
+public class AccountControllerIntegrationTest {
 
     private String testUsername = "userTest";
     private AccountDTO testAccountDTO = new AccountDTO();

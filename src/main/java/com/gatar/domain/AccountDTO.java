@@ -44,7 +44,6 @@ public class AccountDTO implements Serializable{
     public Account toAccount(){
         Account account = new Account();
         account.setUsername(username);
-        account.setPassword(password);
         account.setEmail(email);
         return account;
     }

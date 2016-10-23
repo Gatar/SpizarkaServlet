@@ -2,7 +2,7 @@ package com.gatar.controllers;
 
 import com.gatar.domain.BarcodeDTO;
 import com.gatar.domain.ItemDTO;
-import com.gatar.services.DataService;
+import com.gatar.services.DataServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class InputDataController {
 
     @Autowired
-    DataService dataService;
+    DataServiceImpl dataServiceImpl;
 
     /**
      * Save new/update existing item in database.
@@ -21,7 +21,7 @@ public class InputDataController {
      */
     @RequestMapping(value = "/{user}/saveItem", method = RequestMethod.POST)
     public HttpStatus saveItem(@PathVariable String username, @RequestBody ItemDTO itemDTO){
-        dataService.saveItem(itemDTO, username);
+        dataServiceImpl.saveItem(itemDTO, username);
         return HttpStatus.OK;
     }
 
@@ -33,7 +33,7 @@ public class InputDataController {
      */
     @RequestMapping(value = "/{user}/saveBarcode",method = RequestMethod.POST)
     public HttpStatus saveBarcode(@PathVariable String username, @RequestBody BarcodeDTO barcodeDTO){
-        dataService.saveBarcode(barcodeDTO, username);
+        dataServiceImpl.saveBarcode(barcodeDTO, username);
         return HttpStatus.OK;
     }
 

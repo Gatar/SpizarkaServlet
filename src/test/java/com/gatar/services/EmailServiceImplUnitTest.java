@@ -16,16 +16,16 @@ import java.util.List;
 /**
  * Testing only failure mail send properties, ex. wrong account.
  */
-public class EmailServiceTest {
+public class EmailServiceImplUnitTest {
 
     @InjectMocks
-    EmailService emailService;
+    EmailServiceImpl emailServiceImpl;
 
     @Spy
-    DataService dataService;
+    DataServiceImpl dataServiceImpl;
 
     @Spy
-    AccountService accountService;
+    AccountServiceImpl accountServiceImpl;
 
     private String testUsername = "user1";
     private AccountDTO testAccountDTO = new AccountDTO();
@@ -35,7 +35,7 @@ public class EmailServiceTest {
 
     @Before
     public void setupMock(){
-        emailService = new EmailService();
+        emailServiceImpl = new EmailServiceImpl();
         MockitoAnnotations.initMocks(this);
 
         testAccountDTO.setUsername(testUsername);
@@ -68,20 +68,20 @@ public class EmailServiceTest {
         String incorrectEmail = "aaa.pl";
         String incorrectUser = "nothing";
 
-        Mockito.doReturn(null).when(dataService).getShoppingList(Matchers.anyString());
-        Mockito.doReturn(itemsWithQuantityBelowMinimum).when(dataService).getShoppingList(testUsername);
+        Mockito.doReturn(null).when(dataServiceImpl).getShoppingList(Matchers.anyString());
+        Mockito.doReturn(itemsWithQuantityBelowMinimum).when(dataServiceImpl).getShoppingList(testUsername);
 
-        Assert.assertEquals(HttpStatus.NOT_ACCEPTABLE,emailService.sendShoppingListEmail(correctEmail,incorrectUser));
-        Assert.assertEquals(HttpStatus.CONFLICT,emailService.sendShoppingListEmail(incorrectEmail,testUsername));
+        Assert.assertEquals(HttpStatus.NOT_ACCEPTABLE, emailServiceImpl.sendShoppingListEmail(correctEmail,incorrectUser));
+        Assert.assertEquals(HttpStatus.CONFLICT, emailServiceImpl.sendShoppingListEmail(incorrectEmail,testUsername));
     }
 
     @Test
     public void sendAccountDataRemember() throws Exception {
         String incorrectUser = "nothing";
-        Mockito.doReturn(null).when(accountService).getAccount(Matchers.anyString());
-        Mockito.doReturn(testUserAccount).when(accountService).getAccount(testUsername);
+        Mockito.doReturn(null).when(accountServiceImpl).getAccount(Matchers.anyString());
+        Mockito.doReturn(testUserAccount).when(accountServiceImpl).getAccount(testUsername);
 
-        Assert.assertEquals(HttpStatus.NOT_ACCEPTABLE,emailService.sendAccountDataRemember(incorrectUser));
+        Assert.assertEquals(HttpStatus.NOT_ACCEPTABLE, emailServiceImpl.sendAccountDataRemember(incorrectUser));
     }
 
 }

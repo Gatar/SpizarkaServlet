@@ -34,17 +34,19 @@ import java.util.stream.Collectors;
  * - correctness of entity dependencies
  */
 
+//TODO Dodać usuwanie konta
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class DataServiceIntegrationTest {
+public class DataServiceImplIntegrationTest {
 
     public static boolean firstTest = true;
 
     @Autowired
-    DataService dataService;
+    DataServiceImpl dataServiceImpl;
 
     @Autowired
-    AccountService accountService;
+    AccountServiceImpl accountServiceImpl;
 
     @Autowired
     ItemDAO itemDAO;
@@ -139,22 +141,22 @@ public class DataServiceIntegrationTest {
             sampleBarcodeFakeItem.setIdItemAndroid(8L);
             sampleBarcodeFakeItem.setBarcodeValue("5abcd");
 
-            accountService.saveAccount(accountDTOuser1);
-            accountService.saveAccount(accountDTOuser2);
+            accountServiceImpl.saveAccount(accountDTOuser1);
+            accountServiceImpl.saveAccount(accountDTOuser2);
     }
 
     @Test
     public void saveItem() throws Exception {
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem,username1));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem,username2));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem2,username1));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem3,username2));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem4,username1));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem4,username2));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewItem,dataService.saveItem(sampleItem5,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem, dataServiceImpl.saveItem(sampleItem,username1));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem, dataServiceImpl.saveItem(sampleItem,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem, dataServiceImpl.saveItem(sampleItem2,username1));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem, dataServiceImpl.saveItem(sampleItem3,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem, dataServiceImpl.saveItem(sampleItem4,username1));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem, dataServiceImpl.saveItem(sampleItem4,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem, dataServiceImpl.saveItem(sampleItem5,username2));
 
-        Assert.assertEquals(DataService.SaveFeedback.UpdatedExistingItem,dataService.saveItem(sampleItem,username1));
-        Assert.assertEquals(DataService.SaveFeedback.UpdatedExistingItem,dataService.saveItem(sampleItem,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.UpdatedExistingItem, dataServiceImpl.saveItem(sampleItem,username1));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.UpdatedExistingItem, dataServiceImpl.saveItem(sampleItem,username2));
 
         Assert.assertEquals(sampleItem,itemDAO.findByIdItemAndroidAndAccount(1L,accountDAO.findByUsername(username1)).toItemDTO());
         Assert.assertEquals(sampleItem2,itemDAO.findByIdItemAndroidAndAccount(2L,accountDAO.findByUsername(username1)).toItemDTO());
@@ -168,18 +170,18 @@ public class DataServiceIntegrationTest {
     @Test
     public void saveBarcode() throws Exception {
 
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode,username1));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode,username2));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode3,username1));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode2,username2));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode3,username2));
-        Assert.assertEquals(DataService.SaveFeedback.AddedNewBarcode,dataService.saveBarcode(sampleBarcode4,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewBarcode, dataServiceImpl.saveBarcode(sampleBarcode,username1));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewBarcode, dataServiceImpl.saveBarcode(sampleBarcode,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewBarcode, dataServiceImpl.saveBarcode(sampleBarcode3,username1));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewBarcode, dataServiceImpl.saveBarcode(sampleBarcode2,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewBarcode, dataServiceImpl.saveBarcode(sampleBarcode3,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewBarcode, dataServiceImpl.saveBarcode(sampleBarcode4,username2));
 
-        Assert.assertEquals(DataService.SaveFeedback.BarcodeAlreadyExist,dataService.saveBarcode(sampleBarcode,username1));
-        Assert.assertEquals(DataService.SaveFeedback.BarcodeAlreadyExist,dataService.saveBarcode(sampleBarcode,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.BarcodeAlreadyExist, dataServiceImpl.saveBarcode(sampleBarcode,username1));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.BarcodeAlreadyExist, dataServiceImpl.saveBarcode(sampleBarcode,username2));
 
-        Assert.assertEquals(DataService.SaveFeedback.ItemForBarcodeNotExist,dataService.saveBarcode(sampleBarcodeFakeItem,username1));
-        Assert.assertEquals(DataService.SaveFeedback.ItemForBarcodeNotExist,dataService.saveBarcode(sampleBarcodeFakeItem,username2));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.ItemForBarcodeNotExist, dataServiceImpl.saveBarcode(sampleBarcodeFakeItem,username1));
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.ItemForBarcodeNotExist, dataServiceImpl.saveBarcode(sampleBarcodeFakeItem,username2));
 
     }
 
@@ -188,8 +190,8 @@ public class DataServiceIntegrationTest {
         List<BarcodeDTO> user1Barcodes = Arrays.asList(sampleBarcode, sampleBarcode3);
         List<BarcodeDTO> user2Barcodes = Arrays.asList(sampleBarcode, sampleBarcode2, sampleBarcode3, sampleBarcode4);
 
-        Assert.assertEquals(user1Barcodes,dataService.getAllBarcodes(username1));
-        Assert.assertEquals(user2Barcodes,dataService.getAllBarcodes(username2));
+        Assert.assertEquals(user1Barcodes, dataServiceImpl.getAllBarcodes(username1));
+        Assert.assertEquals(user2Barcodes, dataServiceImpl.getAllBarcodes(username2));
     }
 
     @Test
@@ -197,8 +199,8 @@ public class DataServiceIntegrationTest {
         List<ItemDTO> user1Items = Arrays.asList(sampleItem,sampleItem2,sampleItem4);
         List<ItemDTO> user2Items = Arrays.asList(sampleItem,sampleItem3,sampleItem4,sampleItem5);
 
-        Assert.assertEquals(user1Items,dataService.getAllItems(username1));
-        Assert.assertEquals(user2Items,dataService.getAllItems(username2));
+        Assert.assertEquals(user1Items, dataServiceImpl.getAllItems(username1));
+        Assert.assertEquals(user2Items, dataServiceImpl.getAllItems(username2));
     }
 
     @Test
@@ -206,8 +208,8 @@ public class DataServiceIntegrationTest {
         List<ItemDTO> user1Items = Arrays.asList(sampleItem4);
         List<ItemDTO> user2Items = Arrays.asList(sampleItem4,sampleItem5);
 
-        Assert.assertEquals(user1Items,dataService.getShoppingList(username1).stream().map(s->s.toItemDTO()).collect(Collectors.toList()));
-        Assert.assertEquals(user2Items,dataService.getShoppingList(username2).stream().map(s->s.toItemDTO()).collect(Collectors.toList()));
+        Assert.assertEquals(user1Items, dataServiceImpl.getShoppingList(username1).stream().map(s->s.toItemDTO()).collect(Collectors.toList()));
+        Assert.assertEquals(user2Items, dataServiceImpl.getShoppingList(username2).stream().map(s->s.toItemDTO()).collect(Collectors.toList()));
     }
 
 }

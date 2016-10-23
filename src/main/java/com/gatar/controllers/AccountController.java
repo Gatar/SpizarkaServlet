@@ -1,8 +1,8 @@
 package com.gatar.controllers;
 
 import com.gatar.domain.AccountDTO;
-import com.gatar.services.AccountService;
-import com.gatar.services.EmailService;
+import com.gatar.services.AccountServiceImpl;
+import com.gatar.services.EmailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     @Autowired
-    AccountService accountService;
+    AccountServiceImpl accountServiceImpl;
 
     @Autowired
-    EmailService emailService;
+    EmailServiceImpl emailServiceImpl;
 
     /**
      * Add new Account with data like in AccountDTO: username, password and email
@@ -24,8 +24,8 @@ public class AccountController {
      */
     @RequestMapping(value = "/addNewAccount", method = RequestMethod.POST)
     public ResponseEntity<Void> addNewAccount(@RequestBody AccountDTO accountDTO){
-        AccountService.AccountFeedback responseAccountService = accountService.saveAccount(accountDTO);
-        HttpStatus responseHttpStatus = (responseAccountService.equals(AccountService.AccountFeedback.AccountCreated)) ? HttpStatus.CREATED : HttpStatus.NOT_ACCEPTABLE;
+        AccountServiceImpl.AccountFeedback responseAccountService = accountServiceImpl.saveAccount(accountDTO);
+        HttpStatus responseHttpStatus = (responseAccountService.equals(AccountServiceImpl.AccountFeedback.AccountCreated)) ? HttpStatus.CREATED : HttpStatus.NOT_ACCEPTABLE;
 
         return new ResponseEntity<Void>(responseHttpStatus);
     }
@@ -37,7 +37,7 @@ public class AccountController {
      */
     @RequestMapping(value = "/{username}/getDataVersion", method = RequestMethod.GET)
     public ResponseEntity<Long> getDataVersion(@PathVariable String username){
-        Long databaseVersion = accountService.getDataVersion(username);
+        Long databaseVersion = accountServiceImpl.getDataVersion(username);
         HttpStatus responseHttpStatus = (databaseVersion.equals(-1L)) ? HttpStatus.BAD_REQUEST : HttpStatus.OK;
         return new ResponseEntity<Long>(databaseVersion,responseHttpStatus);
     }
@@ -50,8 +50,8 @@ public class AccountController {
      */
     @RequestMapping(value = "/{username}/putDataVersion", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<Void> putDataVersion(@PathVariable String username, @RequestBody Long databaseVersion){
-        AccountService.AccountFeedback responseAccountSerivce = accountService.putDataVersion(databaseVersion,username);
-        HttpStatus responseHttpStatus = (responseAccountSerivce.equals(AccountService.AccountFeedback.AccountDatabaseNumberActualized))? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE;
+        AccountServiceImpl.AccountFeedback responseAccountSerivce = accountServiceImpl.putDataVersion(databaseVersion,username);
+        HttpStatus responseHttpStatus = (responseAccountSerivce.equals(AccountServiceImpl.AccountFeedback.AccountDatabaseNumberActualized))? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE;
 
         return new ResponseEntity<Void>(responseHttpStatus);
     }
@@ -62,7 +62,7 @@ public class AccountController {
      */
     @RequestMapping(value = "/{username}/rememberAccountData")
     public void sendEmailWithResetedPassword(@PathVariable String username){
-        emailService.sendAccountDataRemember(username);
+        emailServiceImpl.sendAccountDataRemember(username);
     }
 
     /**
@@ -73,8 +73,8 @@ public class AccountController {
      */
     @RequestMapping(value = "/{username}/changePassword", method = RequestMethod.POST)
     public ResponseEntity<Void> changePassword(@PathVariable String username, @RequestBody String newPassword){
-        AccountService.AccountFeedback responseAccountSerivce = accountService.changePassword(newPassword,username);
-        HttpStatus responseHttpStatus = (responseAccountSerivce.equals(AccountService.AccountFeedback.AccountPasswordActualized))? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE;
+        AccountServiceImpl.AccountFeedback responseAccountSerivce = accountServiceImpl.changePassword(newPassword,username);
+        HttpStatus responseHttpStatus = (responseAccountSerivce.equals(AccountServiceImpl.AccountFeedback.AccountPasswordActualized))? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE;
 
         return new ResponseEntity<Void>(responseHttpStatus);
     }
@@ -85,6 +85,6 @@ public class AccountController {
      */
     @RequestMapping(value = "/{username}/delete")
     public void deleteAccount(@PathVariable String username){
-        accountService.deleteAccount(username);
+        accountServiceImpl.deleteAccount(username);
     }
 }

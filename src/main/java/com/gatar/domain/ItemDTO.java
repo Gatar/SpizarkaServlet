@@ -1,7 +1,5 @@
 package com.gatar.domain;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
