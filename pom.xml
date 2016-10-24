@@ -5,8 +5,8 @@
 
 	<groupId>com.gatar</groupId>
 	<artifactId>spizarkaservlet</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<version>0.1-ALPHA</version>
+	<packaging>war</packaging>
 
 	<name>SpizarkaServlet</name>
 	<description>Servlet for provide Spizarka app cloud database</description>
