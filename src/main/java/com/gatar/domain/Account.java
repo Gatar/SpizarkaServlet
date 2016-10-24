@@ -6,6 +6,11 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Account entity class.
+ * If table "ACCOUNTS" doesn't exist, application creates it automaticaly.
+ */
+
 @Entity(name = "ACCOUNTS")
 public class Account implements Serializable {
 
@@ -34,10 +39,6 @@ public class Account implements Serializable {
     @Column(name = "DATA_VERSION")
     private Long dataVersion;
 
-    /**
-     * Contains always "USER", implement for authorities purpose.
-     */
-
     @JsonIgnore
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Item> items;
@@ -61,6 +62,7 @@ public class Account implements Serializable {
     /**
      * As ROLE for each user there is used its unique username. Example: when someone tries to access with useename Fred to path /George/getAllItems,
      * Fred account ROLE will be also 'Fred' and access to /George/** path require ROLE 'George', so access will be denited.
+     * IMPORTANT: field Role doesn't exist!!!
      * @return username as role.
      */
     public String getRole() {

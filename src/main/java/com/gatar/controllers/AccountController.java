@@ -20,7 +20,7 @@ public class AccountController {
     /**
      * Add new Account with data like in AccountDTO: username, password and email
      * @param accountDTO new Account data
-     * @return HttpStatus.CREATED after put data in database, HttpStatus.NOT_ACCEPTABLE if account with this username already exist
+     * @return ResponseEntity containing: HttpStatus.CREATED after put data in database, HttpStatus.NOT_ACCEPTABLE if account with this username already exist
      */
     @RequestMapping(value = "/addNewAccount", method = RequestMethod.POST)
     public ResponseEntity<Void> addNewAccount(@RequestBody AccountDTO accountDTO){
@@ -32,8 +32,9 @@ public class AccountController {
 
     /**
      * Get version of data saved in servlet database.
+     * Database version is used for ensure the same data in every single device connected with Account.
      * @param username name of user needed to connect with right Account
-     * @return version of database for the username Account
+     * @return ResponseEntity containing: Long version of Account's database and -1L if Account doesn't exist. HttpStatus.OK when everything was OK, HttpStatus.BAD_REQUEST if account doesn't exist
      */
     @RequestMapping(value = "/{username}/getDataVersion", method = RequestMethod.GET)
     public ResponseEntity<Long> getDataVersion(@PathVariable String username){
@@ -43,10 +44,11 @@ public class AccountController {
     }
 
     /**
-     * Save new version of data to servlet database.
+     * Save new version of data to servlet database. Version should be increased by 1 after EVERY modification in phone.
+     * Database version is used for ensure the same data in every single device connected with Account.
      * @param username name of user needed to connect with right Account
-     * @param databaseVersion new version of database after some modification in phone
-     * @return HttpStatus.OK - if version is one higher than version in database (ex. new 3453, old 3452), HttpStatus.NOT_ACCEPTABLE if version difference is other
+     * @param databaseVersion new version of database
+     * @return ResponseEntity containing: HttpStatus.OK - if version is one higher than version in database (ex. new 3453, old 3452), HttpStatus.NOT_ACCEPTABLE if version difference is other
      */
     @RequestMapping(value = "/{username}/putDataVersion", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<Void> putDataVersion(@PathVariable String username, @RequestBody Long databaseVersion){
@@ -57,7 +59,9 @@ public class AccountController {
     }
 
     /**
-     * Send an email with Account data saved in database. Password is randomly reset to 6-digit string. If user didn't connect any email with his account email naturally won't be send.
+     * Send an email with Account data saved in database. Password is randomly reset to 6-digit string.
+     * If user didn't connect any email with his account email naturally won't be send and access will be permanently lost.
+     * This functionality are NOT secured.
      * @param username name of user needed to connect with right Account
      */
     @RequestMapping(value = "/{username}/rememberAccountData")
@@ -66,10 +70,10 @@ public class AccountController {
     }
 
     /**
-     * Change account password, for example if user reset password to random by sending an email.
+     * Change account password, for new one (for example after it reset to random value).
      * @param username name of user needed to connect with right Account
      * @param newPassword new password as String
-     * @return HttpStatus.OK - password changed, HttpStatus.NOT_ACCEPTABLE Account doesn't exist
+     * @return ResponseEntity containing: HttpStatus.OK - password changed, HttpStatus.NOT_ACCEPTABLE Account doesn't exist
      */
     @RequestMapping(value = "/{username}/changePassword", method = RequestMethod.POST)
     public ResponseEntity<Void> changePassword(@PathVariable String username, @RequestBody String newPassword){

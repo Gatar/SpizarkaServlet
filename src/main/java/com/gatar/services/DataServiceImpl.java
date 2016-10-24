@@ -6,14 +6,13 @@ import com.gatar.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Class ensuring service of main databases BarcodeDAO and ItemDAO. They are often used together so it's one service for handling them..
+ * Class ensuring service of main databases BarcodeDAO and ItemDAO. They are often used together so it's one service for handling them.
  */
 @Service
 public class DataServiceImpl implements DataService{
@@ -28,9 +27,9 @@ public class DataServiceImpl implements DataService{
     AccountServiceImpl accountServiceImpl;
 
     /**
-     * Save new/update existing item in database. Searching first in database if there exist item.
+     * {@inheritDoc}
      * @param itemDTO item data
-     * @param username
+     * @param username to bind Item with Account
      * @return SaveFeedback.UpdatedExistingItem - item exist before in database, has been updated, SaveFeedback.AddedNewItem - new item added to database
      */
     public SaveFeedback saveItem(ItemDTO itemDTO, String username){
@@ -50,9 +49,9 @@ public class DataServiceImpl implements DataService{
     }
 
     /**
-     * Save new barcode. If existing barcode will be find nothing will be saved (to prevent duplication).
+     * {@inheritDoc}
      * @param barcodeDTO barcode data
-     * @param username
+     * @param username to bind Barcode with Account
      * @return SaveFeedback.ItemForBarcodeNotExist - item describen in Barcode doesn't exist in database, SaveFeedback.BarcodeAlreadyExist - there are the same barcode for this item in database, SaveFeedback.AddedNewBarcode - barcode added correctly
      */
     public SaveFeedback saveBarcode(BarcodeDTO barcodeDTO, String username){
@@ -75,8 +74,9 @@ public class DataServiceImpl implements DataService{
     }
 
     /**
-     * Get list of all barcodes SENDING_FROM database, for one account.
-     * @return barcodeDTO object
+     * {@inheritDoc}
+     * @param username specifying Account for Barcodes extract
+     * @return list of all Barcodes connected with one Account
      */
     public List<BarcodeDTO> getAllBarcodes(String username){
         List<Item> items = getItemListByUser(username);
@@ -96,8 +96,9 @@ public class DataServiceImpl implements DataService{
     }
 
     /**
-     * Get list of all items SENDING_FROM database, for one account.
-     * @return itemDTO object
+     * {@inheritDoc}
+     * @param username specifying Account for Items extract
+     * @return list of all Items connected with one Account
      */
     public List<ItemDTO> getAllItems(String username){
         List<Item> items = getItemListByUser(username);
@@ -109,8 +110,9 @@ public class DataServiceImpl implements DataService{
     }
 
     /**
-     * Get list of all items with quantity lower than minimum.
-     * @return item object
+     * {@inheritDoc}
+     * @param username specifying Account
+     * @return list of Items with quantity lower than minimum
      */
     public List<Item> getShoppingList(String username){
         List<Item> list = getItemListByUser(username);

@@ -18,7 +18,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,10 +27,6 @@ import static org.junit.Assert.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DataControllersIntergrationTest {
-
-    private String firstTestUsername = "firstUserDataTest";
-    private String secondTestUsername = "secondUserDataTest";
-    private String thirdTestUsername = "emptyItemUserdataTest";
 
     private AccountDTO firstTestAccountDTO = new AccountDTO();
     private AccountDTO secondTestAccountDTO = new AccountDTO();
@@ -64,14 +59,17 @@ public class DataControllersIntergrationTest {
 
     @Before
     public void setUp() throws Exception {
+        String firstTestUsername = "firstUserDataTest";
         firstTestAccountDTO.setUsername(firstTestUsername);
         firstTestAccountDTO.setEmail("gatarpl@gmail.com");
         firstTestAccountDTO.setPassword("password");
 
+        String secondTestUsername = "secondUserDataTest";
         secondTestAccountDTO.setUsername(secondTestUsername);
         secondTestAccountDTO.setEmail("gatarpl@gmail.com");
         secondTestAccountDTO.setPassword("password2");
 
+        String thirdTestUsername = "emptyItemUserdataTest";
         emptyItemTestAccountDTO.setUsername(thirdTestUsername);
         emptyItemTestAccountDTO.setEmail("gatarpl@gmail.com");
         emptyItemTestAccountDTO.setPassword("emptyPassword");

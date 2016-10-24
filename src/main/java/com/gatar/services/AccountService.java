@@ -6,10 +6,10 @@ import com.gatar.domain.AccountDTO;
 public interface AccountService {
 
     /** Get single account from database, based on username.
-     * @param username
+     * @param username to find Account
      * @return Account reference from database.
      */
-    public Account getAccount(String username);
+    Account getAccount(String username);
 
 
     /** Actualize version of database for received account.
@@ -18,7 +18,7 @@ public interface AccountService {
      * @param username Account which database version should be changed username
      * @return AccountFeedback
      */
-    public AccountFeedback putDataVersion(Long dataVersion, String username);
+    AccountFeedback putDataVersion(Long dataVersion, String username);
 
 
     /**
@@ -26,7 +26,7 @@ public interface AccountService {
      * @param username Account username
      * @return database version for Account
      */
-    public Long getDataVersion(String username);
+    Long getDataVersion(String username);
 
     /**
      * Change Account password in database.
@@ -35,7 +35,7 @@ public interface AccountService {
      * @param username username of Account
      * @return AccountFeedback
      */
-    public AccountFeedback changePassword(String newPassword, String username);
+    AccountFeedback changePassword(String newPassword, String username);
 
 
     /**
@@ -44,18 +44,18 @@ public interface AccountService {
      * @param accountDTO new account data
      * @return AccountFeedback
      */
-    public AccountFeedback saveAccount(AccountDTO accountDTO);
+    AccountFeedback saveAccount(AccountDTO accountDTO);
 
     /**
      * Delete from database Account described by username.
      * @param username of Account to delete.
      */
-    public void deleteAccount(String username);
+    void deleteAccount(String username);
 
     /**
      * Possible return info about saving database version or adding new account.
      */
-    public enum AccountFeedback {
+    enum AccountFeedback {
         AccountCreated,
         AccountAlreadyExist,
         AccountDatabaseNumberActualized,

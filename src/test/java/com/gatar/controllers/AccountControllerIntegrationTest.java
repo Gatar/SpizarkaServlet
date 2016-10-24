@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AccountControllerIntegrationTest {
 
-    private String testUsername = "userTest";
+
     private AccountDTO testAccountDTO = new AccountDTO();
     private HttpHeaders httpHeadersTestAccount;
     private HttpHeaders httpHeadersWrongPassword;
@@ -36,6 +36,8 @@ public class AccountControllerIntegrationTest {
     @Before
     public void setupMock(){
         MockitoAnnotations.initMocks(this);
+
+        String testUsername = "userTest";
 
         testAccountDTO.setUsername(testUsername);
         testAccountDTO.setEmail("gatarpl@gmail.com");

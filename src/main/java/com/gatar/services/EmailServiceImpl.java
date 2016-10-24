@@ -13,7 +13,7 @@ import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Service for sending an emails from predefined, outer email account (settings are in {@see EmailService}).
+ * Service for sending an emails from predefined, outer email account.
  * Everything is set for GMail email, but can be easily changed in interface.
  */
 @Service
@@ -27,10 +27,10 @@ public class EmailServiceImpl implements EmailService {
 
 
     /**
-     * Sending shopping list (items with quantity below minimum).
+     * {@inheritDoc}
      * @param recipietEmail email on which will be send shopping list.
      * @param username username of list
-     * @return return HttpStatus.OK when everything was OK and HttpStatus.CONFLICT if there were Exceptions in sendEmail method.
+     * @return HttpStatus.OK when everything was OK and HttpStatus.CONFLICT if there were Exceptions in sendEmail method.
      */
     public HttpStatus sendShoppingListEmail(String recipietEmail, String username){
         String subject = "lista zakupów";
@@ -50,7 +50,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     /**
-     * Sending Account data to email, which is binded to Account. Password are reseted to random 6-digit string.
+     * {@inheritDoc}
+     * Password is reset to random 6-digit string by private method resetAccountPassword in this class.
      * @param username username for reset password
      * @return return HttpStatus.OK when everything was OK and HttpStatus.CONFLICT if there were Exceptions in sendEmail method.
      */
