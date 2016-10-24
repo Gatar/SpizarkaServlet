@@ -6,6 +6,7 @@ import com.gatar.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -126,14 +127,5 @@ public class DataServiceImpl implements DataService{
         return itemDAO.findByAccount(account);
     }
 
-    /**
-     * Possible return info about saving items and barcodes to database or adding new account.
-     */
-    public enum SaveFeedback {
-        AddedNewItem,
-        UpdatedExistingItem,
-        AddedNewBarcode,
-        BarcodeAlreadyExist,
-        ItemForBarcodeNotExist
-    }
+
 }

@@ -2,9 +2,11 @@ package com.gatar.controllers;
 
 import com.gatar.domain.BarcodeDTO;
 import com.gatar.domain.ItemDTO;
+import com.gatar.services.DataService;
 import com.gatar.services.DataServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,10 +21,11 @@ public class InputDataController {
      * @param itemDTO received
      * @return
      */
-    @RequestMapping(value = "/{user}/saveItem", method = RequestMethod.POST)
-    public HttpStatus saveItem(@PathVariable String username, @RequestBody ItemDTO itemDTO){
-        dataServiceImpl.saveItem(itemDTO, username);
-        return HttpStatus.OK;
+    @RequestMapping(value = "/{username}/saveItem", method = RequestMethod.POST)
+    public ResponseEntity<Void> saveItem(@PathVariable String username, @RequestBody ItemDTO itemDTO){
+        DataService.SaveFeedback responseDataService = dataServiceImpl.saveItem(itemDTO, username);
+        HttpStatus responseHttpStatus = (responseDataService.equals(DataService.SaveFeedback.AddedNewItem)) ? HttpStatus.CREATED : HttpStatus.ACCEPTED;
+        return new ResponseEntity<Void>(responseHttpStatus);
     }
 
     /**
@@ -31,10 +34,11 @@ public class InputDataController {
      * @param barcodeDTO received
      * @return
      */
-    @RequestMapping(value = "/{user}/saveBarcode",method = RequestMethod.POST)
-    public HttpStatus saveBarcode(@PathVariable String username, @RequestBody BarcodeDTO barcodeDTO){
-        dataServiceImpl.saveBarcode(barcodeDTO, username);
-        return HttpStatus.OK;
+    @RequestMapping(value = "/{username}/saveBarcode",method = RequestMethod.POST)
+    public ResponseEntity<Void> saveBarcode(@PathVariable String username, @RequestBody BarcodeDTO barcodeDTO){
+        DataService.SaveFeedback responseDataService = dataServiceImpl.saveBarcode(barcodeDTO, username);
+        HttpStatus responseHttpStatus = (responseDataService.equals(DataService.SaveFeedback.AddedNewBarcode)) ? HttpStatus.CREATED : HttpStatus.CONFLICT;
+        return new ResponseEntity<Void>(responseHttpStatus);
     }
 
 }

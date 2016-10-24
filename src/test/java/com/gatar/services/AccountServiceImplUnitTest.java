@@ -63,9 +63,34 @@ public class AccountServiceImplUnitTest {
     }
 
     @Test
-    public void saveAccount() throws Exception {
-        Mockito.when(accountDAO.findByUsername(testUsername2)).thenReturn(null);
+    public void getDataVersion() throws Exception {
         Mockito.when(accountDAO.findByUsername(testUsername)).thenReturn(testUserAccount);
+        Mockito.when(accountDAO.findByUsername(testUsername2)).thenReturn(null);
+        Long correctAccount = 5L;
+        Long incorrectAccount = -1L;
+
+        Assert.assertEquals(correctAccount,accountServiceImpl.getDataVersion(testUsername));
+        Assert.assertEquals(incorrectAccount,accountServiceImpl.getDataVersion(testUsername2));
+    }
+
+    @Test
+    public void changePassword() throws Exception {
+        Mockito.when(accountDAO.findByUsername(testUsername)).thenReturn(testUserAccount);
+        Mockito.when(accountDAO.findByUsername(testUsername2)).thenReturn(null);
+
+        Mockito.when(accountDAO.save(Matchers.any(Account.class))).thenReturn(null);
+
+        AccountServiceImpl.AccountFeedback correctAccount = accountServiceImpl.changePassword("newPassword",testUsername);
+        AccountServiceImpl.AccountFeedback incorrectAccount = accountServiceImpl.changePassword("newPassword",testUsername2);
+
+        Assert.assertEquals(AccountServiceImpl.AccountFeedback.AccountPasswordActualized,correctAccount);
+        Assert.assertEquals(AccountServiceImpl.AccountFeedback.AccountDoesntExist,incorrectAccount);
+    }
+
+    @Test
+    public void saveAccount() throws Exception {
+        Mockito.when(accountDAO.findByUsername(testUsername)).thenReturn(testUserAccount);
+        Mockito.when(accountDAO.findByUsername(testUsername2)).thenReturn(null);
         Mockito.when(accountDAO.save(Matchers.any(Account.class))).thenReturn(null);
 
         AccountServiceImpl.AccountFeedback newAccount = accountServiceImpl.saveAccount(testAccountDTO2);
@@ -74,7 +99,5 @@ public class AccountServiceImplUnitTest {
         Assert.assertEquals(AccountServiceImpl.AccountFeedback.AccountCreated,newAccount);
         Assert.assertEquals(AccountServiceImpl.AccountFeedback.AccountAlreadyExist,existingAccount);
     }
-
-    //TODO Dopisać resztę testów
 
 }

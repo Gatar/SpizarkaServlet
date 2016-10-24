@@ -36,18 +36,19 @@ public class EmailServiceImpl implements EmailService {
         String subject = "lista zakupów";
         StringBuilder content = new StringBuilder("\n\n\tLista zakupów użytkownika " + username + "\n\n");
 
-        Optional<List<Item>> shoppingListFromDatabase = Optional.ofNullable(dataServiceImpl.getShoppingList(username));
-        if(!shoppingListFromDatabase.isPresent()) return HttpStatus.NOT_ACCEPTABLE;
+        Optional<List<Item>> shoppingList = Optional.ofNullable(dataServiceImpl.getShoppingList(username));
+        if(!shoppingList.isPresent() || shoppingList.get().isEmpty()) return HttpStatus.NOT_ACCEPTABLE;
 
-        List<Item> shoppingList = shoppingListFromDatabase.get();
-        for(Item item : shoppingList){
+        for(Item item : shoppingList.get()){
             int quantityToBuy = item.getMinimumQuantity()-item.getQuantity();
             content.append(String.format("\t%d szt. \t%s, \t %s\n",quantityToBuy,item.getTitle(),item.getCategory()));
         }
 
-        return (sendEmail(recipietEmail,subject,content.toString()))? HttpStatus.OK : HttpStatus.CONFLICT;
+        boolean isEmailSendSuccessful = sendEmail(recipietEmail,subject,content.toString());
 
+        return (isEmailSendSuccessful)? HttpStatus.OK : HttpStatus.CONFLICT;
     }
+
     /**
      * Sending Account data to email, which is binded to Account. Password are reseted to random 6-digit string.
      * @param username username for reset password
@@ -66,7 +67,9 @@ public class EmailServiceImpl implements EmailService {
         content.append("\t Hasło: \t\t" + resetAccountPassword(username) + "\n");
 
 
-        return (sendEmail(account.getEmail(),subject,content.toString()))? HttpStatus.OK : HttpStatus.CONFLICT;
+        boolean isEmailSendSuccessful = sendEmail(account.getEmail(),subject,content.toString());
+
+        return (isEmailSendSuccessful)? HttpStatus.OK : HttpStatus.CONFLICT;
     }
 
     private String resetAccountPassword(String username){
@@ -130,9 +133,8 @@ public class EmailServiceImpl implements EmailService {
             return true;
         } catch (MessagingException ex) {
             ex.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
 
