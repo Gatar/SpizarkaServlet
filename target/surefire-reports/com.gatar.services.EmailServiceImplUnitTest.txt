@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.gatar.services.EmailServiceImplUnitTest
--------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.605 sec - in com.gatar.services.EmailServiceImplUnitTest

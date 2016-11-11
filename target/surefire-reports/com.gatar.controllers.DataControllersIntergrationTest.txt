@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.gatar.controllers.DataControllersIntergrationTest
--------------------------------------------------------------------------------
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 34.083 sec - in com.gatar.controllers.DataControllersIntergrationTest

@@ -56,7 +56,7 @@ public class EmailServiceImpl implements EmailService {
      * @return return HttpStatus.OK when everything was OK and HttpStatus.CONFLICT if there were Exceptions in sendEmail method.
      */
     public HttpStatus sendAccountDataRemember(String username){
-        String subject = "Dane konta " + username + ", SpiżarkaApp";
+        final String subject = "Dane konta " + username + ", SpiżarkaApp";
         StringBuilder content = new StringBuilder("\n\tDane konta użytkownika " + username + " dla programu Spiżarka \n\n");
 
         Optional<Account> accountFromDatabase = Optional.ofNullable(accountServiceImpl.getAccount(username));
