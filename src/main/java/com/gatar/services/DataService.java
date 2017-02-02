@@ -1,6 +1,7 @@
 package com.gatar.services;
 
 import com.gatar.domain.BarcodeDTO;
+import com.gatar.domain.EntityDTO;
 import com.gatar.domain.Item;
 import com.gatar.domain.ItemDTO;
 
@@ -24,6 +25,13 @@ public interface DataService {
      */
     SaveFeedback saveBarcode(BarcodeDTO barcodeDTO, String username);
 
+    /**
+     * Save new/update entity (item with barcodes).
+     * @param entityDTO item with barcodes object
+     * @param username to bind Barcode with Account
+     * @return SaveFeedback response
+     */
+    SaveFeedback saveEntity(EntityDTO entityDTO, String username);
 
     /**
      * Get all Barcodes from database, for Account described by username.
@@ -56,6 +64,8 @@ public interface DataService {
         UpdatedExistingItem,
         AddedNewBarcode,
         BarcodeAlreadyExist,
-        ItemForBarcodeNotExist
+        ItemForBarcodeNotExist,
+        EntityAddedOrUpdated,
+        EntityAddingFail
     }
 }

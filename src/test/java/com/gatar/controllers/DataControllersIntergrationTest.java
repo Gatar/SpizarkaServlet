@@ -4,6 +4,7 @@ import com.gatar.database.BarcodeDAO;
 import com.gatar.database.ItemDAO;
 import com.gatar.domain.AccountDTO;
 import com.gatar.domain.BarcodeDTO;
+import com.gatar.domain.EntityDTO;
 import com.gatar.domain.ItemDTO;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.junit.Assert;
@@ -13,11 +14,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.swing.text.html.parser.Entity;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,10 +35,12 @@ public class DataControllersIntergrationTest {
     private AccountDTO firstTestAccountDTO = new AccountDTO();
     private AccountDTO secondTestAccountDTO = new AccountDTO();
     private AccountDTO emptyItemTestAccountDTO = new AccountDTO();
+    private AccountDTO fourthTestAccountDTO = new AccountDTO();
 
     private HttpHeaders firstAccountHttpHeaders;
     private HttpHeaders secondAccountHttpHeaders;
     private HttpHeaders emptyAccountHttpHeaders;
+    private HttpHeaders fourthAccountHttpHeaders;
 
     private ItemDTO sampleItem1 = new ItemDTO();
     private ItemDTO sampleItem2 = new ItemDTO();
@@ -46,6 +52,8 @@ public class DataControllersIntergrationTest {
     private BarcodeDTO sampleBarcode3  = new BarcodeDTO();
     private BarcodeDTO sampleBarcode4  = new BarcodeDTO();
     private BarcodeDTO sampleBarcodeFakeItem  = new BarcodeDTO();
+    private EntityDTO sampleEntity1 = new EntityDTO();
+    private EntityDTO sampleEntity2 = new EntityDTO();
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -74,9 +82,15 @@ public class DataControllersIntergrationTest {
         emptyItemTestAccountDTO.setEmail("gatarpl@gmail.com");
         emptyItemTestAccountDTO.setPassword("emptyPassword");
 
+        String fourthTestUsername = "fourthUserDataTest";
+        fourthTestAccountDTO.setUsername(fourthTestUsername);
+        fourthTestAccountDTO.setEmail("gatarpl@gmail.com");
+        fourthTestAccountDTO.setPassword("password4");
+
         firstAccountHttpHeaders = getHeaders(firstTestAccountDTO.getUsername(), firstTestAccountDTO.getPassword());
         secondAccountHttpHeaders = getHeaders(secondTestAccountDTO.getUsername(), secondTestAccountDTO.getPassword());
         emptyAccountHttpHeaders = getHeaders(emptyItemTestAccountDTO.getUsername(), emptyItemTestAccountDTO.getPassword());
+        fourthAccountHttpHeaders = getHeaders(fourthTestAccountDTO.getUsername(), fourthTestAccountDTO.getPassword());
 
         sampleItem1.setQuantity(10);
         sampleItem1.setIdItemAndroid(1L);
@@ -127,6 +141,27 @@ public class DataControllersIntergrationTest {
 
         sampleBarcodeFakeItem.setIdItemAndroid(8L);
         sampleBarcodeFakeItem.setBarcodeValue("5abcd");
+
+        sampleEntity1.setBarcodes(new ArrayList<>());
+        sampleEntity1.getBarcodes().add("123456");
+        sampleEntity1.getBarcodes().add("1234567");
+        sampleEntity1.setCategory("category1");
+        sampleEntity1.setDescription("desct");
+        sampleEntity1.setIdItemAndroid(1L);
+        sampleEntity1.setMinimumQuantity(12);
+        sampleEntity1.setQuantity(3);
+        sampleEntity1.setTitle("SampleEntity1");
+
+        sampleEntity2.setBarcodes(new ArrayList<>());
+        sampleEntity2.getBarcodes().add("aa123456");
+        sampleEntity2.getBarcodes().add("aa1234567");
+        sampleEntity2.setCategory("category2");
+        sampleEntity2.setDescription("description");
+        sampleEntity2.setIdItemAndroid(2L);
+        sampleEntity2.setMinimumQuantity(5);
+        sampleEntity2.setQuantity(30);
+        sampleEntity2.setTitle("SampleEntity2");
+
     }
 
     private HttpHeaders getHeaders(String username, String pass){
@@ -150,15 +185,18 @@ public class DataControllersIntergrationTest {
         HttpEntity<AccountDTO> requestFirst = new HttpEntity<>(firstTestAccountDTO, firstAccountHttpHeaders);
         HttpEntity<AccountDTO> requestSecond = new HttpEntity<>(secondTestAccountDTO, secondAccountHttpHeaders);
         HttpEntity<AccountDTO> requestEmpty = new HttpEntity<>(emptyItemTestAccountDTO, emptyAccountHttpHeaders);
+        HttpEntity<AccountDTO> requestFourth = new HttpEntity<>(fourthTestAccountDTO, fourthAccountHttpHeaders);
 
         ResponseEntity<Void> addFirstNewAccount = restTemplate.postForEntity(URI,requestFirst,Void.class);
         ResponseEntity<Void> addSecondNewAccount = restTemplate.postForEntity(URI,requestSecond,Void.class);
         ResponseEntity<Void> addEmptyNewAccount = restTemplate.postForEntity(URI,requestEmpty,Void.class);
         ResponseEntity<Void> addExistingAccount = restTemplate.postForEntity(URI,requestFirst,Void.class);
+        ResponseEntity<Void> addFourthNewAccount = restTemplate.postForEntity(URI,requestFourth,Void.class);
 
         assertEquals(HttpStatus.CREATED, addFirstNewAccount.getStatusCode());
         assertEquals(HttpStatus.NOT_ACCEPTABLE,addExistingAccount.getStatusCode());
         assertEquals(HttpStatus.CREATED, addSecondNewAccount.getStatusCode());
+        assertEquals(HttpStatus.CREATED, addFourthNewAccount.getStatusCode());
     }
 
 
@@ -201,6 +239,30 @@ public class DataControllersIntergrationTest {
         Assert.assertEquals(HttpStatus.ACCEPTED,addItem4_firstUser.getStatusCode());
         Assert.assertEquals(HttpStatus.ACCEPTED,addItem1_secondUser.getStatusCode());
 
+    }
+
+    @Test
+    public void Bb_saveEntity() throws Exception{
+        final String URI = generateURI(fourthTestAccountDTO,"saveEntity");
+
+
+        //----------------Adding new Entities for Account-----------------------------------------
+        HttpEntity<EntityDTO> entity1 = new HttpEntity<>(sampleEntity1,fourthAccountHttpHeaders);
+        HttpEntity<EntityDTO> entity2 = new HttpEntity<>(sampleEntity2,fourthAccountHttpHeaders);
+
+        ResponseEntity<Void> addEntity1 = restTemplate.postForEntity(URI,entity1,Void.class);
+        ResponseEntity<Void> addEntity2 = restTemplate.postForEntity(URI,entity2,Void.class);
+
+        Assert.assertEquals(HttpStatus.CREATED,addEntity1.getStatusCode());
+        Assert.assertEquals(HttpStatus.CREATED,addEntity2.getStatusCode());
+
+        //------------- Add existing Entity, shouldn't be duplicated in results----------
+        restTemplate.postForEntity(URI,entity1,Void.class);
+
+        //------------- Add existing, bu modified Entity, should be updated and shown in results----------
+        sampleEntity1.setTitle("Modificeted Entity");
+        HttpEntity<EntityDTO> entityMofified = new HttpEntity<>(sampleEntity1,fourthAccountHttpHeaders);
+        restTemplate.postForEntity(URI,entityMofified,Void.class);
     }
 
     @Test
@@ -255,9 +317,13 @@ public class DataControllersIntergrationTest {
         final String firstURI = generateURI(firstTestAccountDTO,"getAllItems");
         final String secondURI = generateURI(secondTestAccountDTO,"getAllItems");
         final String emptyURI = generateURI(emptyItemTestAccountDTO,"getAllItems");
+        final String fourthURI = generateURI(fourthTestAccountDTO,"getAllItems");
 
         List<ItemDTO> expectedFirstUserItems = Arrays.asList(sampleItem1,sampleItem2,sampleItem4);
         List<ItemDTO> expectedSecondUserItems = Arrays.asList(sampleItem1,sampleItem3,sampleItem4,sampleItem5);
+
+        sampleEntity1.setTitle("Modificeted Entity"); //prepare modification in sample Entity
+        List<ItemDTO> expectedFourthUserItems = Arrays.asList(sampleEntity1.toItem().toItemDTO(),sampleEntity2.toItem().toItemDTO());
 
         //-------------------get All Items which were add before------------------------------------
         HttpEntity<Void> firstUserRequest = new HttpEntity<>(firstAccountHttpHeaders);
@@ -282,6 +348,16 @@ public class DataControllersIntergrationTest {
 
         Assert.assertEquals(0, emptyUserItemsResponse.getBody().length);
         Assert.assertEquals(HttpStatus.CONFLICT,emptyUserItemsResponse.getStatusCode());
+
+        //------------------ get all Items for Account which has been added by EntityDTO--------------
+        HttpEntity<Void> fourthUserRequest = new HttpEntity<>(fourthAccountHttpHeaders);
+
+        ResponseEntity<ItemDTO[]> fourthUserItemResponse = restTemplate.exchange(fourthURI,HttpMethod.GET,fourthUserRequest,ItemDTO[].class);
+
+        List<ItemDTO> receivedFourthUserItems = Arrays.asList(fourthUserItemResponse.getBody());
+
+        Assert.assertEquals(expectedFourthUserItems,receivedFourthUserItems);
+        Assert.assertEquals(HttpStatus.OK,fourthUserItemResponse.getStatusCode());
     }
 
     @Test
@@ -346,18 +422,22 @@ public class DataControllersIntergrationTest {
         final String firstURI = generateURI(firstTestAccountDTO,"delete");
         final String secondURI = generateURI(secondTestAccountDTO,"delete");
         final String emptyURI = generateURI(emptyItemTestAccountDTO,"delete");
+        final String fourthURI = generateURI(fourthTestAccountDTO,"delete");
 
         HttpEntity<Void> requestDeleteFirst = new HttpEntity<>(firstAccountHttpHeaders);
         HttpEntity<Void> requestDeleteSecond = new HttpEntity<>(secondAccountHttpHeaders);
         HttpEntity<Void> requestDeleteEmpty = new HttpEntity<>(emptyAccountHttpHeaders);
+        HttpEntity<Void> requestDeleteFourth = new HttpEntity<>(fourthAccountHttpHeaders);
 
         ResponseEntity<Void> deleteFirst = restTemplate.postForEntity(firstURI,requestDeleteFirst,Void.class);
         ResponseEntity<Void> deleteSecond = restTemplate.postForEntity(secondURI,requestDeleteSecond,Void.class);
         ResponseEntity<Void> deleteEmpty = restTemplate.postForEntity(emptyURI,requestDeleteEmpty,Void.class);
+        ResponseEntity<Void> deleteFourth = restTemplate.postForEntity(fourthURI,requestDeleteFourth,Void.class);
 
         assertEquals(HttpStatus.OK,deleteFirst.getStatusCode());
         assertEquals(HttpStatus.OK,deleteSecond.getStatusCode());
         assertEquals(HttpStatus.OK,deleteEmpty.getStatusCode());
+        assertEquals(HttpStatus.OK,deleteFourth.getStatusCode());
     }
 
 

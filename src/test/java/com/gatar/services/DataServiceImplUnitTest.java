@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -51,6 +52,7 @@ public class DataServiceImplUnitTest {
     private BarcodeDTO sampleBarcode2  = new BarcodeDTO();
     private BarcodeDTO sampleBarcode3  = new BarcodeDTO();
     private BarcodeDTO sampleBarcodeFakeItem  = new BarcodeDTO();
+    private EntityDTO sampleEntity1 = new EntityDTO();
     private Account testUserAccount;
 
     @Before
@@ -97,6 +99,17 @@ public class DataServiceImplUnitTest {
 
         sampleBarcodeFakeItem.setIdItemAndroid(8L);
         sampleBarcodeFakeItem.setBarcodeValue("5abcd");
+
+        sampleEntity1.setBarcodes(new ArrayList<>());
+        sampleEntity1.getBarcodes().add("12345678");
+        sampleEntity1.getBarcodes().add("12345345");
+        sampleEntity1.setQuantity(5);
+        sampleEntity1.setIdItemAndroid(2L);
+        sampleEntity1.setMinimumQuantity(5);
+        sampleEntity1.setDescription("Text 3");
+        sampleEntity1.setTitle("Title 3");
+        sampleEntity1.setCategory("Category 3");
+
     }
 
     @Test
@@ -105,6 +118,16 @@ public class DataServiceImplUnitTest {
         assertNotNull(itemDTO);
         assertNotNull(barcodeDAO);
         assertNotNull(barcodeDTO);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void saveEntity() throws Exception{
+        //add existing EntityDTO
+        DataService.SaveFeedback saveEntity = dataServiceImpl.saveEntity(sampleEntity1,testUsername);
+        Assert.assertEquals(DataServiceImpl.SaveFeedback.EntityAddedOrUpdated,saveEntity);
+
+        //add EntityDTO without barcodes
+        dataServiceImpl.saveEntity(new EntityDTO(),testUsername);
     }
 
     @Test

@@ -6,9 +6,7 @@ import com.gatar.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -75,6 +73,43 @@ public class DataServiceImpl implements DataService{
 
     /**
      * {@inheritDoc}
+     * @param entityDTO item with barcodes object
+     * @param username to bind Barcode with Account
+     * @return SaveFeedback.EntityAddedOrUpdated - entity has been saved in database, SaveFeedback.EntityAddingFail - entity hasn't been saved
+     */
+    public SaveFeedback saveEntity(EntityDTO entityDTO, String username) {
+
+        //TODO Extract this method as separated class, too many inside dependencies for divide to smaller methods
+        Account account = accountServiceImpl.getAccount(username);
+
+        //save Item in database
+        Item item = entityDTO.toItem();
+        item.setAccount(account);
+        //check has item exist already exist in database and if yes, add item's Id to Item object
+        Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(item.getIdItemAndroid(),account));
+        itemFromDatabase.ifPresent(item1 -> item.setIdItem(item1.getIdItem()));
+        itemDAO.save(item);
+
+        //save all barcodes in database
+        Barcode tempBarcode = new Barcode();
+        List<Barcode> existingBarcodes = new LinkedList<>();
+        tempBarcode.setItem(item);
+        //check has item exist already exist in database and if yes, extract item's barcodes to
+        if(itemFromDatabase.isPresent()) existingBarcodes = itemFromDatabase.get().getBarcodes();
+
+        for(String barcode : entityDTO.getBarcodes()){
+            tempBarcode.setBarcodeValue(barcode);
+            if(!existingBarcodes.contains(tempBarcode)) { //prevent add twice the same barcode to item
+                barcodeDAO.save(tempBarcode);
+            }
+        }
+
+        return SaveFeedback.EntityAddedOrUpdated;
+    }
+
+
+    /**
+     * {@inheritDoc}
      * @param username specifying Account for Barcodes extract
      * @return list of all Barcodes connected with one Account
      */
@@ -128,6 +163,8 @@ public class DataServiceImpl implements DataService{
         Account account = accountServiceImpl.getAccount(username);
         return itemDAO.findByAccount(account);
     }
+
+
 
 
 }
