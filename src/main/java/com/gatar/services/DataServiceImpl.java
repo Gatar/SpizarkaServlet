@@ -82,23 +82,28 @@ public class DataServiceImpl implements DataService{
         //TODO Extract this method as separated class, too many inside dependencies for divide to smaller methods
         Account account = accountServiceImpl.getAccount(username);
 
-        //save Item in database
+        //create Item and List of Barcodes objects
         Item item = entityDTO.toItem();
         item.setAccount(account);
+        List<Barcode> existingBarcodes = new LinkedList<>();
+
         //check has item exist already exist in database and if yes, add item's Id to Item object
         Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(item.getIdItemAndroid(),account));
-        itemFromDatabase.ifPresent(item1 -> item.setIdItem(item1.getIdItem()));
+        //itemFromDatabase.ifPresent(item1 -> item.setIdItem(item1.getIdItem()));
+
+        if(itemFromDatabase.isPresent()){
+            Item actualItem = itemFromDatabase.get();
+            item.setIdItem(actualItem.getIdItem());
+            existingBarcodes = actualItem.getBarcodes();
+        }
+
         itemDAO.save(item);
 
-        //save all barcodes in database
-        Barcode tempBarcode = new Barcode();
-        List<Barcode> existingBarcodes = new LinkedList<>();
-        tempBarcode.setItem(item);
-        //check has item exist already exist in database and if yes, extract item's barcodes to
-        if(itemFromDatabase.isPresent()) existingBarcodes = itemFromDatabase.get().getBarcodes();
-
         for(String barcode : entityDTO.getBarcodes()){
+            Barcode tempBarcode = new Barcode();
             tempBarcode.setBarcodeValue(barcode);
+            tempBarcode.setItem(item);
+
             if(!existingBarcodes.contains(tempBarcode)) { //prevent add twice the same barcode to item
                 barcodeDAO.save(tempBarcode);
             }

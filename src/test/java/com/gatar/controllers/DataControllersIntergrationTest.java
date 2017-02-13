@@ -21,6 +21,7 @@ import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.swing.text.html.parser.Entity;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -143,8 +144,8 @@ public class DataControllersIntergrationTest {
         sampleBarcodeFakeItem.setBarcodeValue("5abcd");
 
         sampleEntity1.setBarcodes(new ArrayList<>());
-        sampleEntity1.getBarcodes().add("123456");
-        sampleEntity1.getBarcodes().add("1234567");
+        sampleEntity1.getBarcodes().add(sampleBarcode1.getBarcodeValue());
+        sampleEntity1.getBarcodes().add(sampleBarcode2.getBarcodeValue());
         sampleEntity1.setCategory("category1");
         sampleEntity1.setDescription("desct");
         sampleEntity1.setIdItemAndroid(1L);
@@ -153,8 +154,8 @@ public class DataControllersIntergrationTest {
         sampleEntity1.setTitle("SampleEntity1");
 
         sampleEntity2.setBarcodes(new ArrayList<>());
-        sampleEntity2.getBarcodes().add("aa123456");
-        sampleEntity2.getBarcodes().add("aa1234567");
+        sampleEntity2.getBarcodes().add(sampleBarcode3.getBarcodeValue());
+        sampleEntity2.getBarcodes().add(sampleBarcode4.getBarcodeValue());
         sampleEntity2.setCategory("category2");
         sampleEntity2.setDescription("description");
         sampleEntity2.setIdItemAndroid(2L);
@@ -365,6 +366,7 @@ public class DataControllersIntergrationTest {
         final String firstURI = generateURI(firstTestAccountDTO,"getAllBarcodes");
         final String secondURI = generateURI(secondTestAccountDTO,"getAllBarcodes");
         final String emptyURI = generateURI(emptyItemTestAccountDTO,"getAllBarcodes");
+        final String fourthURI = generateURI(fourthTestAccountDTO,"getAllBarcodes");
 
         List<BarcodeDTO> expectedFirstUserBarcodes = Arrays.asList(sampleBarcode1, sampleBarcode3);
         List<BarcodeDTO> expectedSecondUserBarcodes = Arrays.asList(sampleBarcode1, sampleBarcode2, sampleBarcode3, sampleBarcode4);
@@ -372,17 +374,24 @@ public class DataControllersIntergrationTest {
         //-------------------get All Items which were add before------------------------------------
         HttpEntity<Void> firstUserRequest = new HttpEntity<>(firstAccountHttpHeaders);
         HttpEntity<Void> secondUserRequest = new HttpEntity<>(secondAccountHttpHeaders);
+        HttpEntity<Void> fourthUserRequest = new HttpEntity<>(fourthAccountHttpHeaders);
+
 
         ResponseEntity<BarcodeDTO[]> firstUserBarcodesResponse = restTemplate.exchange(firstURI,HttpMethod.GET,firstUserRequest,BarcodeDTO[].class);
         ResponseEntity<BarcodeDTO[]> secondUserBarcodesResponse = restTemplate.exchange(secondURI,HttpMethod.GET,secondUserRequest,BarcodeDTO[].class);
+        ResponseEntity<BarcodeDTO[]> fourthUserBarcodesResponse = restTemplate.exchange(fourthURI,HttpMethod.GET,fourthUserRequest,BarcodeDTO[].class);
+
 
         List<BarcodeDTO> receivedFirstUserBarcodes = Arrays.asList(firstUserBarcodesResponse.getBody());
         List<BarcodeDTO> receivedSecondUserBarcodes = Arrays.asList(secondUserBarcodesResponse.getBody());
+        List<BarcodeDTO> receivedFourthUserBarcodes = Arrays.asList(fourthUserBarcodesResponse.getBody());
 
         Assert.assertEquals(expectedFirstUserBarcodes,receivedFirstUserBarcodes);
         Assert.assertEquals(expectedSecondUserBarcodes,receivedSecondUserBarcodes);
+        Assert.assertEquals(expectedSecondUserBarcodes,receivedFourthUserBarcodes);
         Assert.assertEquals(HttpStatus.OK,firstUserBarcodesResponse.getStatusCode());
         Assert.assertEquals(HttpStatus.OK,secondUserBarcodesResponse.getStatusCode());
+        Assert.assertEquals(HttpStatus.OK,fourthUserBarcodesResponse.getStatusCode());
 
 
         //--------------------get all Items for Account without any Items--------------------------
