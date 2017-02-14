@@ -24,52 +24,7 @@ public class DataServiceImpl implements DataService{
     @Autowired
     AccountServiceImpl accountServiceImpl;
 
-    /**
-     * {@inheritDoc}
-     * @param itemDTO item data
-     * @param username to bind Item with Account
-     * @return SaveFeedback.UpdatedExistingItem - item exist before in database, has been updated, SaveFeedback.AddedNewItem - new item added to database
-     */
-    public SaveFeedback saveItem(ItemDTO itemDTO, String username){
-        SaveFeedback returnState = SaveFeedback.AddedNewItem;
-        Account account = accountServiceImpl.getAccount(username);
-        Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(itemDTO.getIdItemAndroid(),account));
-
-        Item item = itemDTO.toItem();
-        item.setAccount(accountServiceImpl.getAccount(username));
-
-        if(itemFromDatabase.isPresent()) {
-            item.setIdItem(itemFromDatabase.get().getIdItem());
-            returnState = SaveFeedback.UpdatedExistingItem;
-        }
-        itemDAO.save(item);
-        return  returnState;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @param barcodeDTO barcode data
-     * @param username to bind Barcode with Account
-     * @return SaveFeedback.ItemForBarcodeNotExist - item describen in Barcode doesn't exist in database, SaveFeedback.BarcodeAlreadyExist - there are the same barcode for this item in database, SaveFeedback.AddedNewBarcode - barcode added correctly
-     */
-    public SaveFeedback saveBarcode(BarcodeDTO barcodeDTO, String username){
-        Account account = accountServiceImpl.getAccount(username);
-
-        //Check for presence of item
-        Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(barcodeDTO.getIdItemAndroid(),account));
-        if(!itemFromDatabase.isPresent()) return SaveFeedback.ItemForBarcodeNotExist;
-
-        //Check for presence of barcode value
-        List<Barcode> barcodesFromItem = itemFromDatabase.get().getBarcodes();
-        for(Barcode barcode : barcodesFromItem) {
-            if(barcode.getBarcodeValue().equals(barcodeDTO.getBarcodeValue())) return SaveFeedback.BarcodeAlreadyExist;
-        }
-
-        Barcode barcode = barcodeDTO.toBarcode();
-        barcode.setItem(itemDAO.findByIdItemAndroidAndAccount(barcodeDTO.getIdItemAndroid(), account));
-        barcodeDAO.save(barcode);
-        return SaveFeedback.AddedNewBarcode;
-    }
+    SaveEntity entity;
 
     /**
      * {@inheritDoc}
@@ -78,41 +33,8 @@ public class DataServiceImpl implements DataService{
      * @return SaveFeedback.EntityAddedOrUpdated - entity has been saved in database, SaveFeedback.EntityAddingFail - entity hasn't been saved
      */
     public SaveFeedback saveEntity(EntityDTO entityDTO, String username) {
-
-        //TODO Extract this method as separated class, too many inside dependencies for divide to smaller methods
-        Account account = accountServiceImpl.getAccount(username);
-
-        //create Item and List of Barcodes objects
-        Item item = entityDTO.toItem();
-        item.setAccount(account);
-        List<Barcode> existingBarcodes = new LinkedList<>();
-
-        //check has item exist already exist in database and if yes, add item's Id to Item object
-        Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(item.getIdItemAndroid(),account));
-        //itemFromDatabase.ifPresent(item1 -> item.setIdItem(item1.getIdItem()));
-
-        if(itemFromDatabase.isPresent()){
-            Item actualItem = itemFromDatabase.get();
-            item.setIdItem(actualItem.getIdItem());
-            existingBarcodes = actualItem.getBarcodes();
-        }
-
-        itemDAO.save(item);
-
-        for(String barcode : entityDTO.getBarcodes()){
-            Barcode tempBarcode = new Barcode();
-            tempBarcode.setBarcodeValue(barcode);
-            tempBarcode.setItem(item);
-
-            if(!existingBarcodes.contains(tempBarcode)) { //prevent add twice the same barcode to item
-                barcodeDAO.save(tempBarcode);
-            }
-        }
-
-        //increase db version after save
-        accountServiceImpl.putDataVersion(entityDTO.getDatabaseVersion(),account.getUsername());
-
-        return SaveFeedback.EntityAddedOrUpdated;
+        if(entity == null) entity = new SaveEntity();
+        return entity.save(entityDTO,username);
     }
 
 
@@ -172,7 +94,72 @@ public class DataServiceImpl implements DataService{
         return itemDAO.findByAccount(account);
     }
 
+    private class SaveEntity{
 
+        private EntityDTO entityDTO;
+        private String username;
+        private Account account;
+        private Item item;
+        private List<Barcode> existingBarcodes;
+
+
+        SaveFeedback save(EntityDTO entityDTO, String username){
+            this.entityDTO = entityDTO;
+            this.username = username;
+
+            loadAccountFromDatabase();
+            prepareItemObject();
+            prepareExisitingBarcodesList();
+            saveItem();
+            saveBarcodes();
+            increaseDatabaseVersion();
+
+            return SaveFeedback.EntityAddedOrUpdated;
+        }
+
+        private void loadAccountFromDatabase() {
+            account = accountServiceImpl.getAccount(username);
+        }
+
+        private void prepareItemObject() {
+            item = entityDTO.toItem();
+            item.setAccount(account);
+        }
+
+        private void prepareExisitingBarcodesList(){
+            existingBarcodes = new LinkedList<>();
+
+            Optional<Item> itemFromDatabase = Optional.ofNullable(itemDAO.findByIdItemAndroidAndAccount(item.getIdItemAndroid(), account));
+
+            if (itemFromDatabase.isPresent()) {
+                Item actualItem = itemFromDatabase.get();
+                item.setIdItem(actualItem.getIdItem());
+                existingBarcodes = actualItem.getBarcodes();
+            }
+        }
+
+        private void saveItem(){
+            itemDAO.save(item);
+        }
+
+        private void saveBarcodes(){
+            for (String barcode : entityDTO.getBarcodes()) {
+                Barcode tempBarcode = new Barcode();
+                tempBarcode.setBarcodeValue(barcode);
+                tempBarcode.setItem(item);
+
+                if (isNotContainBarcode(tempBarcode)) barcodeDAO.save(tempBarcode);
+            }
+        }
+
+        private boolean isNotContainBarcode(Barcode barcode){
+            return !existingBarcodes.contains(barcode);
+        }
+
+        private void increaseDatabaseVersion(){
+            accountServiceImpl.putDataVersion(entityDTO.getDatabaseVersion(), account.getUsername());
+        }
+    }
 
 
 }

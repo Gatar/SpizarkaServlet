@@ -37,11 +37,6 @@ public class DataServiceImplUnitTest {
     @Mock
     private BarcodeDTO barcodeDTO;
 
-    @Mock
-    private AccountDAO accountDAO;
-
-    @Mock
-    private Account account;
 
     private String testUsername = "user1";
     private AccountDTO testAccountDTO = new AccountDTO();
@@ -127,27 +122,9 @@ public class DataServiceImplUnitTest {
         Assert.assertEquals(DataServiceImpl.SaveFeedback.EntityAddedOrUpdated,saveEntity);
 
         //add EntityDTO without barcodes
-        dataServiceImpl.saveEntity(new EntityDTO(),testUsername);
+        DataService.SaveFeedback saveEntityWithoutBarcodes =dataServiceImpl.saveEntity(new EntityDTO(),testUsername);
     }
 
-    @Test
-    public void saveItem() throws Exception {
-        Item itemExisted = sampleItemDTO1.toItem();
-        itemExisted.setIdItem(12345L);
-        itemExisted.setAccount(account);
-        Item itemNew = sampleItemDTO2.toItem();
-        itemNew.setAccount(account);
-
-        Mockito.when(itemDAO.findByIdItemAndroidAndAccount(itemExisted.getIdItemAndroid(), testUserAccount)).thenReturn(itemExisted);
-        Mockito.when(itemDAO.findByIdItemAndroidAndAccount(itemNew.getIdItemAndroid(), testUserAccount)).thenReturn(null);
-
-        DataServiceImpl.SaveFeedback saveExistingItem = dataServiceImpl.saveItem(sampleItemDTO1, testUsername);
-        DataServiceImpl.SaveFeedback saveNewItem = dataServiceImpl.saveItem(sampleItemDTO2, testUsername);
-
-        Assert.assertEquals(DataServiceImpl.SaveFeedback.UpdatedExistingItem,saveExistingItem);
-        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewItem,saveNewItem);
-
-    }
 
     @Test
     public void getAllBarcodes() throws Exception {
@@ -182,24 +159,6 @@ public class DataServiceImplUnitTest {
         Assert.assertEquals(user1ItemsDTO,user1AllItems);
     }
 
-    @Test
-    public void saveBarcode() throws Exception{
-        Item itemExist = sampleItemDTO1.toItem();
-        itemExist.setBarcodes(Collections.emptyList());
-        Item itemNotExist = null;
-
-        Mockito.when(itemDAO.findByIdItemAndroidAndAccount(sampleBarcode1.getIdItemAndroid(), testUserAccount)).thenReturn(itemExist);
-        Mockito.when(itemDAO.findByIdItemAndroidAndAccount(sampleBarcodeFakeItem.getIdItemAndroid(), testUserAccount)).thenReturn(itemNotExist);
-
-        DataServiceImpl.SaveFeedback saveToExistingItemWithoutThisBarcode = dataServiceImpl.saveBarcode(sampleBarcode1, testUsername);
-        itemExist.setBarcodes(Arrays.asList(sampleBarcode1.toBarcode()));
-        DataServiceImpl.SaveFeedback saveToExistingItemWithThisBarcode = dataServiceImpl.saveBarcode(sampleBarcode1, testUsername);
-        DataServiceImpl.SaveFeedback saveToNonExistingItem = dataServiceImpl.saveBarcode(sampleBarcodeFakeItem, testUsername);
-
-        Assert.assertEquals(DataServiceImpl.SaveFeedback.AddedNewBarcode,saveToExistingItemWithoutThisBarcode);
-        Assert.assertEquals(DataServiceImpl.SaveFeedback.BarcodeAlreadyExist,saveToExistingItemWithThisBarcode);
-        Assert.assertEquals(DataServiceImpl.SaveFeedback.ItemForBarcodeNotExist,saveToNonExistingItem);
-    }
 
     @Test
     public void getShoppingList() throws Exception{

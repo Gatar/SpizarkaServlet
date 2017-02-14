@@ -10,22 +10,6 @@ import java.util.List;
 public interface DataService {
 
     /**
-     * Save new/update existing item in database. Searching first in database if there exist item.
-     * @param itemDTO item data
-     * @param username to bind Item with Account
-     * @return SaveFeedback response
-     */
-    SaveFeedback saveItem(ItemDTO itemDTO, String username);
-
-    /**
-     * Save new barcode. If existing barcode will be find nothing should be saved (to prevent duplication).
-     * @param barcodeDTO barcode data
-     * @param username to bind Barcode with Account
-     * @return SaveFeedback response
-     */
-    SaveFeedback saveBarcode(BarcodeDTO barcodeDTO, String username);
-
-    /**
      * Save new/update entity (item with barcodes).
      * @param entityDTO item with barcodes object
      * @param username to bind Barcode with Account
