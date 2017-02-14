@@ -17,6 +17,7 @@ public class EntityDTO implements Serializable {
     private Integer quantity;
     private Integer minimumQuantity;
     private String description;
+    private Long databaseVersion;
     private ArrayList<String> barcodes;
 
     public Long getIdItemAndroid() {
@@ -65,6 +66,14 @@ public class EntityDTO implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getDatabaseVersion() {
+        return databaseVersion;
+    }
+
+    public void setDatabaseVersion(Long databaseVersion) {
+        this.databaseVersion = databaseVersion;
     }
 
     public ArrayList<String> getBarcodes() {

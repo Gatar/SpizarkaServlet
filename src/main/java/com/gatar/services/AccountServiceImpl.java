@@ -15,6 +15,8 @@ import java.util.Optional;
 @Service
 public class AccountServiceImpl implements AccountService {
 
+    final Long INITIAL_DATABASE_VERSION = 1L;
+
     @Autowired
     AccountDAO accountDAO;
 
@@ -83,6 +85,7 @@ public class AccountServiceImpl implements AccountService {
         if (!isAccountExist(accountDTO.getUsername())) {
             Account account = accountDTO.toAccount();
             account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
+            account.setDataVersion(INITIAL_DATABASE_VERSION);
             accountDAO.save(account);
             return AccountFeedback.AccountCreated;
         } else {

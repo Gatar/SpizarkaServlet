@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LongSummaryStatistics;
+
 @RestController
 public class AccountController {
 
@@ -49,12 +51,14 @@ public class AccountController {
      * @param username name of user needed to connect with right Account
      * @param databaseVersion new version of database
      * @return ResponseEntity containing: HttpStatus.OK - if version is one higher than version in database (ex. new 3453, old 3452), HttpStatus.NOT_ACCEPTABLE if version difference is other
+     *
+     * @deprecated pass data version with single item data in {@link com.gatar.domain.EntityDTO} object
      */
+    @Deprecated
     @RequestMapping(value = "/{username}/putDataVersion", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<Void> putDataVersion(@PathVariable String username, @RequestBody Long databaseVersion){
-        AccountServiceImpl.AccountFeedback responseAccountSerivce = accountServiceImpl.putDataVersion(databaseVersion,username);
+    public ResponseEntity<Void> putDataVersion(@PathVariable String username, @RequestBody String databaseVersion){
+        AccountServiceImpl.AccountFeedback responseAccountSerivce = accountServiceImpl.putDataVersion(Long.parseLong(databaseVersion),username);
         HttpStatus responseHttpStatus = (responseAccountSerivce.equals(AccountServiceImpl.AccountFeedback.AccountDatabaseNumberActualized))? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE;
-
         return new ResponseEntity<Void>(responseHttpStatus);
     }
 

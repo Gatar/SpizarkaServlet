@@ -22,7 +22,10 @@ public class InputDataController {
      * @param itemDTO DTO object with new/update Item data
      * @param username for specifying Account
      * @return ResponseEntity containing: HttpStatus.CREATED after create new Item in database, HttpStatus.ACCEPTED after update Item data
-     */
+     *
+     * @deprecated use saveEntity from this class (contains both barcodes and item data)
+     * */
+    @Deprecated
     @RequestMapping(value = "/{username}/saveItem", method = RequestMethod.POST)
     public ResponseEntity<Void> saveItem(@PathVariable String username, @RequestBody ItemDTO itemDTO){
         DataService.SaveFeedback responseDataService = dataServiceImpl.saveItem(itemDTO, username);
@@ -36,7 +39,10 @@ public class InputDataController {
      * @param barcodeDTO DTO object with new Barcode data
      * @param username for specifying Account
      * @return ResponseEntity containing: HttpStatus.OK when everything was OK, HttpStatus.CONFLICT if there were Exceptions in email sending method and HttpStatus.NOT_ACCEPTABLE when Account doesn't exist or when list is empty
+     *
+     * @deprecated use saveEntity from this class (contains both barcodes and item data)
      */
+    @Deprecated
     @RequestMapping(value = "/{username}/saveBarcode",method = RequestMethod.POST)
     public ResponseEntity<Void> saveBarcode(@PathVariable String username, @RequestBody BarcodeDTO barcodeDTO){
         DataService.SaveFeedback responseDataService = dataServiceImpl.saveBarcode(barcodeDTO, username);

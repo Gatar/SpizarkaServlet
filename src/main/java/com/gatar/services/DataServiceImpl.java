@@ -109,6 +109,9 @@ public class DataServiceImpl implements DataService{
             }
         }
 
+        //increase db version after save
+        accountServiceImpl.putDataVersion(entityDTO.getDatabaseVersion(),account.getUsername());
+
         return SaveFeedback.EntityAddedOrUpdated;
     }
 

@@ -151,6 +151,7 @@ public class DataControllersIntergrationTest {
         sampleEntity1.setIdItemAndroid(1L);
         sampleEntity1.setMinimumQuantity(12);
         sampleEntity1.setQuantity(3);
+        sampleEntity1.setDatabaseVersion(2L);
         sampleEntity1.setTitle("SampleEntity1");
 
         sampleEntity2.setBarcodes(new ArrayList<>());
@@ -161,6 +162,7 @@ public class DataControllersIntergrationTest {
         sampleEntity2.setIdItemAndroid(2L);
         sampleEntity2.setMinimumQuantity(5);
         sampleEntity2.setQuantity(30);
+        sampleEntity2.setDatabaseVersion(3L);
         sampleEntity2.setTitle("SampleEntity2");
 
     }
@@ -262,6 +264,7 @@ public class DataControllersIntergrationTest {
 
         //------------- Add existing, bu modified Entity, should be updated and shown in results----------
         sampleEntity1.setTitle("Modificeted Entity");
+        sampleEntity1.setDatabaseVersion(4L);
         HttpEntity<EntityDTO> entityMofified = new HttpEntity<>(sampleEntity1,fourthAccountHttpHeaders);
         restTemplate.postForEntity(URI,entityMofified,Void.class);
     }

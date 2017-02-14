@@ -73,17 +73,17 @@ public class AccountControllerIntegrationTest {
     @Test
     public void B_putDataVersion() throws Exception {
         final String URI = "/"+testAccountDTO.getUsername()+"/putDataVersion";
-        Long firstVersion = 5L;
-        Long correctNewVersion = 6L;
+        Long firstVersion = 2L;
+        Long correctNewVersion = 3L;
         Long previousVersion = 1L;
         Long toHighVersion = 100L;
 
-        HttpEntity<Long> requestFirstVersion = new HttpEntity<>(firstVersion,httpHeadersTestAccount);
-        HttpEntity<Long> requestCorrectNewVersion = new HttpEntity<>(correctNewVersion,httpHeadersTestAccount);
-        HttpEntity<Long> requestTooHighVersion = new HttpEntity<>(previousVersion,httpHeadersTestAccount);
-        HttpEntity<Long> requestTooLowVersion = new HttpEntity<>(toHighVersion,httpHeadersTestAccount);
-        HttpEntity<Long> requestWrongUser = new HttpEntity<>(toHighVersion,httpHeadersWrongUser);
-        HttpEntity<Long> requestWrongPassword = new HttpEntity<>(toHighVersion,httpHeadersWrongPassword);
+        HttpEntity<String> requestFirstVersion = new HttpEntity<>(firstVersion.toString(),httpHeadersTestAccount);
+        HttpEntity<String> requestCorrectNewVersion = new HttpEntity<>(correctNewVersion.toString(),httpHeadersTestAccount);
+        HttpEntity<String> requestTooHighVersion = new HttpEntity<>(previousVersion.toString(),httpHeadersTestAccount);
+        HttpEntity<String> requestTooLowVersion = new HttpEntity<>(toHighVersion.toString(),httpHeadersTestAccount);
+        HttpEntity<String> requestWrongUser = new HttpEntity<>(toHighVersion.toString(),httpHeadersWrongUser);
+        HttpEntity<String> requestWrongPassword = new HttpEntity<>(toHighVersion.toString(),httpHeadersWrongPassword);
 
         ResponseEntity<Void> responseFirstVersion = restTemplate.postForEntity(URI,requestFirstVersion,Void.class);
         ResponseEntity<Void> responseCorrectNewVersion = restTemplate.postForEntity(URI,requestCorrectNewVersion,Void.class);
@@ -109,7 +109,7 @@ public class AccountControllerIntegrationTest {
     public void C_getDataVersion() throws Exception {
         final String URI = "/"+testAccountDTO.getUsername()+"/getDataVersion";
         final String WrongURI = "/wrong/getDataVersion";
-        Long correctNewVersion = 6L;
+        Long correctNewVersion = 3L;
         Long badUsernameVersion = -1L;
 
         HttpEntity<Void> requestDataVersion = new HttpEntity<>(httpHeadersTestAccount);
